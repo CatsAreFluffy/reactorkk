@@ -1,11 +1,11 @@
 # reactorkk
-A knockoff of a knockoff of a knockoff (jk) of a small component of a Minecraft mod.
+A knockoff of a knockoff of a knockoff (jk) of a small component of a Minecraft mod. Play at https://catsarefluffy.github.io/reactorkk/
 
 Coming soon:
-Cells!
-Money!
-Grid!
+Cells cost money!
+Cells deplete!
 Coming less soon:
-More cells!
 New parts!
 GUI!
+Heat system!
+More cells!
