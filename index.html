@@ -11,6 +11,13 @@ function run(){
     window.context=canvas.getContext("2d")
     window.bux=10
     window.buxpertick=0
+    window.reactor=[]
+    for(i=0;i<=canvas.width/30;i++){
+        reactor.push([])
+        for(j=0;j<=canvas.width/30;j++){
+            reactor[reactor.length-1].push({type:"empty"})
+        }
+    }
     canvas.addEventListener('click',click,false)
     setInterval(income,500)
     drawGrid()
@@ -29,25 +36,55 @@ function drawGrid(){
     context.stroke()
 }
 function loadImages(){
-    window.uranium1img=new Image()
-    uranium1img.src="./uranium1.png"
+    var images=["uranium1","uranium1d"]
+    for(i=0;i<images.length;i++){
+        window[images[i]+"img"]=new Image()
+        window[images[i]+"img"].src="./"+images[i]+".png"
+    }
 }
 function click(event){
-    var x=event.pageX-canvasleft
-    var y=event.pageY-canvastop
-    var ioffset=3
-    var ooffset=3
-    var scale=30
-    x=(x-ioffset)/scale;y=(y-ioffset)/scale
-    x=Math.round(x);y=Math.round(y)
-    x=x*scale+ooffset;y=y*scale+ooffset
-    context.fillStyle="#000000"
-    context.drawImage(uranium1img,x,y)
-    context.stroke()
-    buxpertick+=1
+        var x=event.pageX-canvasleft
+        var y=event.pageY-canvastop
+        var ioffset=18
+        var ooffset=3
+        var scale=30
+        x=(x-ioffset)/scale;y=(y-ioffset)/scale
+        x=Math.round(x);y=Math.round(y)
+        gridx=x;gridy=y
+        x=x*scale+ooffset;y=y*scale+ooffset
+    if(bux>=10&&reactor[gridx][gridy]["type"]=="empty"){
+        reactor[gridx][gridy]={type:"cell",image:"uranium1",income:1,power:15,drawx:x,drawy:y}
+        bux-=10
+        update("bux","$"+bux)
+    }
 }
 function income(){
+    buxpertick=0
+    context.clearRect(0, 0, canvas.width, canvas.height)
+    drawGrid()
+    for(i=0;i<reactor.length;i++){
+        for(j=0;j<reactor[i].length;j++){
+            cell=reactor[i][j]
+            switch(cell["type"]){
+                case "empty":
+                    break;
+                case "cell":
+                    context.drawImage(window[cell["image"]+"img"],cell["drawx"],cell["drawy"])
+                    buxpertick+=cell["income"]
+                    cell["power"]--
+                    if(!cell["power"]){cell["type"]="dcell";cell["image"]+="d"}
+                    break;
+                case "dcell":
+                    context.drawImage(window[cell["image"]+"img"],cell["drawx"],cell["drawy"])
+                    break;
+            }
+        }
+    }
+    context.stroke()
     bux+=buxpertick
-    document.getElementById("bux").innerHTML="$"+bux
+    update("bux","$"+bux)
+}
+function update(thing,value){
+    document.getElementById(thing).innerHTML=value
 }
 </script>
