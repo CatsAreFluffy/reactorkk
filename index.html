@@ -1,5 +1,5 @@
 <html><head></head><body onload="run()">
-<div id="bux">$10</div>
+<div id="bux">Money: $10</div><div id="heat">Heat: 0</div><button onclick="prevItem()">&lt;</button><div id="item">Uranium Cell</div><button onclick="nextItem()">&gt;</button><br>
 <canvas id="game" width=450 height=450 style="border:1px solid #000000;">
 You can't run the game :( ^ Update your browser to play ^
 </canvas>
@@ -10,34 +10,37 @@ function run(){
     window.canvastop=canvas.offsetTop
     window.context=canvas.getContext("2d")
     window.bux=10
+    window.heat=0
     window.buxpertick=0
+    window.item=0
+    window.items=[{name:"uranium1",gname:"Uranium Cell",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0}},{name:"vent1",gname:"Basic Vent",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0}}]
     window.reactor=[]
-    for(i=0;i<=canvas.width/30;i++){
+    for(var i=0;i<=canvas.width/30;i++){
         reactor.push([])
-        for(j=0;j<=canvas.width/30;j++){
-            reactor[reactor.length-1].push({type:"empty"})
+        for(var j=0;j<=canvas.width/30;j++){
+            reactor[reactor.length-1].push({type:"empty",explosion:0})
         }
     }
     canvas.addEventListener('click',click,false)
     setInterval(income,500)
     drawGrid()
+    context.stroke()
     loadImages()
 }
 function drawGrid(){
     context.beginPath()
-    for(i=30;i<canvas.width;i+=30){
+    for(var i=30;i<canvas.width;i+=30){
         context.moveTo(i,0)
         context.lineTo(i,canvas.height)
     }
-    for(i=30;i<canvas.height;i+=30){
+    for(var i=30;i<canvas.height;i+=30){
         context.moveTo(0,i)
         context.lineTo(canvas.width,i)
     }
-    context.stroke()
 }
 function loadImages(){
-    var images=["uranium1","uranium1d"]
-    for(i=0;i<images.length;i++){
+    var images=["uranium1","uranium1d","vent1"]
+    for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
     }
@@ -52,20 +55,67 @@ function click(event){
         x=Math.round(x);y=Math.round(y)
         gridx=x;gridy=y
         x=x*scale+ooffset;y=y*scale+ooffset
-    if(bux>=10&&reactor[gridx][gridy]["type"]=="empty"){
-        reactor[gridx][gridy]={type:"cell",image:"uranium1",income:1,power:15,drawx:x,drawy:y}
-        bux-=10
-        update("bux","$"+bux)
+        var object=items[item]
+    if(bux>=object.cost&&reactor[gridx][gridy].type=="empty"){
+        reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
+        bux-=object.cost
+        update("bux","Money: $"+bux)
     }
+}
+function nextItem(){
+        item+=1
+        item%=items.length
+        update("item",items[item].gname)
+}
+function prevItem(){
+        if(!item){item=items.length}
+        item-=1
+        update("item",items[item].gname)
 }
 function income(){
     buxpertick=0
     context.clearRect(0, 0, canvas.width, canvas.height)
-    drawGrid()
-    for(i=0;i<reactor.length;i++){
-        for(j=0;j<reactor[i].length;j++){
+    for(var i=0;i<reactor.length;i++){ //heat plus tick
+        for(var j=0;j<reactor[i].length;j++){
             cell=reactor[i][j]
-            switch(cell["type"]){
+            switch(cell.type){
+                case "empty":
+                    break;
+                case "cell":
+                    addheat(i,j,cell.heat)
+                    break;
+                case "dcell":
+                    break;
+                case "vent":
+                    break;
+                default:
+                    console.log("Unexpected item: "+cell.type)
+            }
+        }
+    }
+    for(var i=0;i<reactor.length;i++){ //heat minus tick
+        for(var j=0;j<reactor[i].length;j++){
+            cell=reactor[i][j]
+            switch(cell.type){
+                case "empty":
+                    break;
+                case "cell":
+                    break;
+                case "dcell":
+                    break;
+                case "vent":
+                    cell.heat-=cell.vent
+                    if(cell.heat<0){cell.heat=0}
+                    break;
+                default:
+                    console.log("Unexpected item: "+cell.type)
+            }
+        }
+    }
+    for(var i=0;i<reactor.length;i++){ //generic tick
+        for(var j=0;j<reactor[i].length;j++){
+            cell=reactor[i][j]
+            switch(cell.type){
                 case "empty":
                     break;
                 case "cell":
@@ -76,15 +126,52 @@ function income(){
                     break;
                 case "dcell":
                     context.drawImage(window[cell["image"]+"img"],cell["drawx"],cell["drawy"])
+                    if(cell.heat>cell.capacity){
+                        cell={type:"empty",explosion:0}
+                    }
                     break;
+                case "vent":
+                    context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+                    break;
+                default:
+                    console.log("Unexpected item: "+cell.type)
             }
         }
     }
+    drawGrid()
     context.stroke()
     bux+=buxpertick
-    update("bux","$"+bux)
+    heat-=0.1
+    clampheat()
+    update("bux","Money: $"+bux)
+    update("heat","Heat: "+heat)
 }
 function update(thing,value){
     document.getElementById(thing).innerHTML=value
 }
+function addheat(x,y,heat){
+    var cells=[]
+    if(x>0){cells.push(reactor[x-1][y])}
+    if(y>0){cells.push(reactor[x][y-1])}
+    if(x<reactor.length-1){cells.push(reactor[x+1][y])}
+    if(y<reactor[0].length-1){cells.push(reactor[x][y+1])}
+    var heatcells=[]
+    for(var i=0;i<cells.length;i++){
+        if(cells[i].capacity>0){heatcells.push(cells[i])}
+    }
+    if(heatcells.length){
+        for(var i=0;i<heatcells.length;i++){
+            heatcells[i].heat+=heat/heatcells.length
+        }
+    }else{
+        window.heat+=heat
+        clampheat()
+        update("heat","Heat: "+window.heat)
+    }
+}
+function clampheat(){
+        if(heat<0){heat=0}
+        heat=Math.round(heat*10)/10
+}
+    
 </script>
