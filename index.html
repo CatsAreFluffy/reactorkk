@@ -1,22 +1,53 @@
 <html><head></head><body onload="run()">
-<canvas id="game" width=300 height=300 style="border:1px solid #000000;">
-You can't run the game :(
+<div id="bux">$10</div>
+<canvas id="game" width=450 height=450 style="border:1px solid #000000;">
+You can't run the game :( ^ Update your browser to play ^
 </canvas>
 <script>
 function run(){
-    //wait, what goes here? oh, right
     window.canvas=document.getElementById("game")
     window.canvasleft=canvas.offsetLeft
     window.canvastop=canvas.offsetTop
     window.context=canvas.getContext("2d")
+    window.bux=10
+    window.buxpertick=0
     canvas.addEventListener('click',click,false)
+    setInterval(income,500)
+    drawGrid()
+    loadImages()
+}
+function drawGrid(){
+    context.beginPath()
+    for(i=30;i<canvas.width;i+=30){
+        context.moveTo(i,0)
+        context.lineTo(i,canvas.height)
+    }
+    for(i=30;i<canvas.height;i+=30){
+        context.moveTo(0,i)
+        context.lineTo(canvas.width,i)
+    }
+    context.stroke()
+}
+function loadImages(){
+    window.uranium1img=new Image()
+    uranium1img.src="./uranium1.png"
 }
 function click(event){
     var x=event.pageX-canvasleft
     var y=event.pageY-canvastop
+    var ioffset=3
+    var ooffset=3
+    var scale=30
+    x=(x-ioffset)/scale;y=(y-ioffset)/scale
+    x=Math.round(x);y=Math.round(y)
+    x=x*scale+ooffset;y=y*scale+ooffset
     context.fillStyle="#000000"
-    context.fillRect(x,y,30,30)
+    context.drawImage(uranium1img,x,y)
     context.stroke()
-    console.log("clicked")
+    buxpertick+=1
+}
+function income(){
+    bux+=buxpertick
+    document.getElementById("bux").innerHTML="$"+bux
 }
 </script>
