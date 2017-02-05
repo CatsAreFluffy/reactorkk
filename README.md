@@ -2,4 +2,10 @@
 A knockoff of a knockoff of a knockoff (jk) of a small component of a Minecraft mod.
 
 Coming soon:
-Place squares on a canvas!
+Cells!
+Money!
+Grid!
+Coming less soon:
+More cells!
+New parts!
+GUI!
