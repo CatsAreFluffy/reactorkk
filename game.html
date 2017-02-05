@@ -1,0 +1,22 @@
+<html><head></head><body onload="run()">
+<canvas id="game" width=300 height=300 style="border:1px solid #000000;">
+You can't run the game :(
+</canvas>
+<script>
+function run(){
+    //wait, what goes here? oh, right
+    window.canvas=document.getElementById("game")
+    window.canvasleft=canvas.offsetLeft
+    window.canvastop=canvas.offsetTop
+    window.context=canvas.getContext("2d")
+    canvas.addEventListener('click',click,false)
+}
+function click(event){
+    var x=event.pageX-canvasleft
+    var y=event.pageY-canvastop
+    context.fillStyle="#000000"
+    context.fillRect(x,y,30,30)
+    context.stroke()
+    console.log("clicked")
+}
+</script>
