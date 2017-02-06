@@ -17,7 +17,13 @@ function run(){
     window.heat=0
     window.buxpertick=0
     window.item=0
-    window.items=[{name:"uranium1",gname:"Uranium Cell",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,sell:0}},{name:"vent1",gname:"Basic Vent",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}}]
+    window.items=[
+    {name:"uranium1",gname:"Uranium Cell",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,sell:0}},
+    {name:"uranium2",gname:"Dual Uranium Cell",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,sell:0}},
+    {name:"uranium4",gname:"Quad Uranium Cell",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,sell:0}},
+    {name:"uranium8",gname:"Octo Uranium Cell",cost:140,default:{type:"cell",image:"uranium4",income:32,heat:128,power:15,capacity:0,sell:0}},
+    {name:"vent1",gname:"Basic Vent",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}}
+    ]
     window.reactor=[]
     for(var i=0;i<=canvas.width/30;i++){
         reactor.push([])
@@ -44,7 +50,7 @@ function drawGrid(){
     }
 }
 function loadImages(){
-    var images=["uranium1","uranium1d","vent1"]
+    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","vent1"]
     for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
@@ -150,16 +156,17 @@ function income(){
                     break;
                 case "dcell":
                     context.drawImage(window[cell["image"]+"img"],cell["drawx"],cell["drawy"])
-                    if(cell.heat>cell.capacity){
-                        cell={type:"empty",explosion:0}
-                    }
                     break;
                 case "vent":
                     context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+                    if(cell.heat>cell.capacity){
+                        reactor[i][j]={type:"empty",explosion:4}
+                    }
                     break;
                 default:
                     console.log("Unexpected item: "+cell.type)
             }
+            if(heat>1000){reactor[i][j]={type:"empty",explosion:4}}
         }
     }
     drawGrid()
