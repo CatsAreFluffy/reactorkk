@@ -1,5 +1,9 @@
 <html><head></head><body onload="run()">
-<div id="bux">Money: $10</div><div id="heat">Heat: 0</div><button onclick="prevItem()">&lt;</button><div id="item">Uranium Cell</div><button onclick="nextItem()">&gt;</button><br>
+<span id="bux">Money: $10</span>
+<span id="heat">Heat: 0</span><br>
+<button onclick="prevItem()">&lt;</button>
+<span id="item">Uranium Cell</span>
+<button onclick="nextItem()">&gt;</button><br>
 <canvas id="game" width=450 height=450 style="border:1px solid #000000;">
 You can't run the game :( ^ Update your browser to play ^
 </canvas>
@@ -13,7 +17,7 @@ function run(){
     window.heat=0
     window.buxpertick=0
     window.item=0
-    window.items=[{name:"uranium1",gname:"Uranium Cell",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0}},{name:"vent1",gname:"Basic Vent",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0}}]
+    window.items=[{name:"uranium1",gname:"Uranium Cell",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,sell:0}},{name:"vent1",gname:"Basic Vent",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}}]
     window.reactor=[]
     for(var i=0;i<=canvas.width/30;i++){
         reactor.push([])
@@ -21,7 +25,8 @@ function run(){
             reactor[reactor.length-1].push({type:"empty",explosion:0})
         }
     }
-    canvas.addEventListener('click',click,false)
+    canvas.onclick=click
+    canvas.oncontextmenu=rclick
     setInterval(income,500)
     drawGrid()
     context.stroke()
@@ -46,22 +51,41 @@ function loadImages(){
     }
 }
 function click(event){
-        var x=event.pageX-canvasleft
-        var y=event.pageY-canvastop
-        var ioffset=18
-        var ooffset=3
-        var scale=30
-        x=(x-ioffset)/scale;y=(y-ioffset)/scale
-        x=Math.round(x);y=Math.round(y)
-        gridx=x;gridy=y
-        x=x*scale+ooffset;y=y*scale+ooffset
-        var object=items[item]
+    var x=event.pageX-canvasleft
+    var y=event.pageY-canvastop
+    var ioffset=18
+    var ooffset=3
+    var scale=30
+    x=(x-ioffset)/scale;y=(y-ioffset)/scale
+    x=Math.round(x);y=Math.round(y)
+    gridx=x;gridy=y
+    x=x*scale+ooffset;y=y*scale+ooffset
+    var object=items[item]
     if(bux>=object.cost&&reactor[gridx][gridy].type=="empty"){
         reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
         bux-=object.cost
         update("bux","Money: $"+bux)
     }
 }
+function rclick(event){
+    var x=event.pageX-canvasleft
+    var y=event.pageY-canvastop
+    var ioffset=18
+    var ooffset=3
+    var scale=30
+    x=(x-ioffset)/scale;y=(y-ioffset)/scale
+    x=Math.round(x);y=Math.round(y)
+    gridx=x;gridy=y
+    x=x*scale+ooffset;y=y*scale+ooffset
+    var cell=reactor[gridx][gridy]
+    if(cell.type!="empty"){
+        bux+=cell.sell
+        reactor[gridx][gridy]={type:"empty",explosion:0}
+        update("bux","Money: $"+bux)
+    }
+    return false;
+}
+
 function nextItem(){
         item+=1
         item%=items.length
