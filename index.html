@@ -1,6 +1,8 @@
 <html><head></head><body onload="run()">
 <span id="bux">Money: $10</span>
-<span id="heat">Heat: 0</span><br>
+<span id="power">Power: 0/100</span>
+<button onclick="sellpower()">Sell!</button>
+<span id="heat">Heat: 0/1000</span><br>
 <button onclick="prevItem()">&lt;</button>
 <span id="item">Uranium Cell</span>
 <button onclick="nextItem()">&gt;</button><br>
@@ -14,15 +16,18 @@ function run(){
     window.canvastop=canvas.offsetTop
     window.context=canvas.getContext("2d")
     window.bux=10
+    window.power=0
+    window.maxpower=100
     window.heat=0
     window.buxpertick=0
     window.item=0
     window.items=[
-    {name:"uranium1",gname:"Uranium Cell",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,sell:0}},
-    {name:"uranium2",gname:"Dual Uranium Cell",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,sell:0}},
-    {name:"uranium4",gname:"Quad Uranium Cell",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,sell:0}},
-    {name:"uranium8",gname:"Octo Uranium Cell",cost:140,default:{type:"cell",image:"uranium4",income:32,heat:128,power:15,capacity:0,sell:0}},
-    {name:"vent1",gname:"Basic Vent",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}}
+    {name:"uranium1",gname:"Uranium Cell ($10)",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,sell:0}},
+    {name:"uranium2",gname:"Dual Uranium Cell ($25)",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,sell:0}},
+    {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,sell:0}},
+    {name:"uranium8",gname:"Octo Uranium Cell ($140)",cost:140,default:{type:"cell",image:"uranium4",income:32,heat:128,power:15,capacity:0,sell:0}},
+    {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}},
+    {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000}}
     ]
     window.reactor=[]
     for(var i=0;i<=canvas.width/30;i++){
@@ -50,7 +55,7 @@ function drawGrid(){
     }
 }
 function loadImages(){
-    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","vent1"]
+    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","vent1","cap1"]
     for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
@@ -69,8 +74,7 @@ function click(event){
     var object=items[item]
     if(bux>=object.cost&&reactor[gridx][gridy].type=="empty"){
         reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
-        bux-=object.cost
-        update("bux","Money: $"+bux)
+        updateBux(-object.cost)
     }
 }
 function rclick(event){
@@ -85,13 +89,15 @@ function rclick(event){
     x=x*scale+ooffset;y=y*scale+ooffset
     var cell=reactor[gridx][gridy]
     if(cell.type!="empty"){
-        bux+=cell.sell
         reactor[gridx][gridy]={type:"empty",explosion:0}
-        update("bux","Money: $"+bux)
+        updateBux(cell.sell)
     }
     return false;
 }
-
+function sellpower(){
+    updateBux(power)
+    updatePower(-power)
+}
 function nextItem(){
         item+=1
         item%=items.length
@@ -118,6 +124,8 @@ function income(){
                     break;
                 case "vent":
                     break;
+                case "capacitor":
+                    break;
                 default:
                     console.log("Unexpected item: "+cell.type)
             }
@@ -136,6 +144,8 @@ function income(){
                 case "vent":
                     cell.heat-=cell.vent
                     if(cell.heat<0){cell.heat=0}
+                    break;
+                case "capacitor":
                     break;
                 default:
                     console.log("Unexpected item: "+cell.type)
@@ -163,6 +173,11 @@ function income(){
                         reactor[i][j]={type:"empty",explosion:4}
                     }
                     break;
+                case "capacitor":
+                    if(cell.heat>cell.capacity){
+                        reactor[i][j]={type:"empty",explosion:4}
+                    }
+                    break;
                 default:
                     console.log("Unexpected item: "+cell.type)
             }
@@ -171,14 +186,25 @@ function income(){
     }
     drawGrid()
     context.stroke()
-    bux+=buxpertick
-    heat-=0.1
-    clampheat()
-    update("bux","Money: $"+bux)
-    update("heat","Heat: "+heat)
+    updatePower(buxpertick)
+    updateHeat(-0.1)
 }
 function update(thing,value){
     document.getElementById(thing).innerHTML=value
+}
+function updateBux(amount){
+    bux+=amount
+    update("bux","Money: $"+bux)
+}
+function updatePower(amount){
+    power+=amount
+    if(power>maxpower){power=maxpower}
+    update("power","Power: "+power+"/"+maxpower)
+}
+function updateHeat(amount){
+    heat+=amount
+    clampheat()
+    update("heat","Heat: "+heat+"/1000")
 }
 function addheat(x,y,heat){
     var cells=[]
@@ -195,9 +221,7 @@ function addheat(x,y,heat){
             heatcells[i].heat+=heat/heatcells.length
         }
     }else{
-        window.heat+=heat
-        clampheat()
-        update("heat","Heat: "+window.heat)
+        updateHeat(heat)
     }
 }
 function clampheat(){
