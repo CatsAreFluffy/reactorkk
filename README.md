@@ -1,15 +1,16 @@
 # reactorkk
 A knockoff of a knockoff of a knockoff (jk) of a small component of a Minecraft mod. Play at https://catsarefluffy.github.io/reactorkk/
 
-Coming in 0.1.2:
-* Multi cells!
-* Meltdowns!
+Coming in 0.1.3:
 * Max heat indicator!
-
-Coming before/in 0.2:
+* Price tags!
 * Power!
-* More parts!
+* Capacitors!
+
+Coming in 0.2:
+* Advanced Heat Vents!
+* Plutonium!
 
 Coming sometime soon:
-* More tiers!
 * Pulses!
+* New part types!
