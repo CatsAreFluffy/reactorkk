@@ -4,31 +4,23 @@
 <button onclick="sellpower()">Sell!</button>
 <span id="heat">Heat: 0/1000</span><br>
 <button onclick="prevItem()">&lt;</button>
-<span id="item">Uranium Cell</span>
+<span id="item">Uranium Cell (Click the grid!)</span>
 <button onclick="nextItem()">&gt;</button><br>
+<div>
 <canvas id="game" width=450 height=450 style="border:1px solid #000000;">
 You can't run the game :( ^ Update your browser to play ^
 </canvas>
+</div>
+<br>
+Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
 <script>
 function run(){
     window.canvas=document.getElementById("game")
     window.canvasleft=canvas.offsetLeft
     window.canvastop=canvas.offsetTop
     window.context=canvas.getContext("2d")
-    window.bux=10
-    window.power=0
-    window.maxpower=100
-    window.heat=0
-    window.buxpertick=0
+    resetValues(2)
     window.item=0
-    window.items=[
-    {name:"uranium1",gname:"Uranium Cell ($10)",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,sell:0}},
-    {name:"uranium2",gname:"Dual Uranium Cell ($25)",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,sell:0}},
-    {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,sell:0}},
-    {name:"uranium8",gname:"Octo Uranium Cell ($140)",cost:140,default:{type:"cell",image:"uranium4",income:32,heat:128,power:15,capacity:0,sell:0}},
-    {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}},
-    {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000}}
-    ]
     window.reactor=[]
     for(var i=0;i<=canvas.width/30;i++){
         reactor.push([])
@@ -43,6 +35,30 @@ function run(){
     context.stroke()
     loadImages()
 }
+function resetValues(tier){
+    window.maxpower=100
+    window.buxpertick=0
+    if(tier>0){
+        window.bux=10000
+        window.power=0
+        window.heat=0
+    }
+    if(tier>1){
+        window.items=[
+        {name:"uranium1",gname:"Uranium Cell ($10)",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,pulses:1,sell:0,name:"uranium1",replacecost:10}},
+        {name:"uranium2",gname:"Dual Uranium Cell ($25)",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,pulses:2,sell:0,name:"uranium2",replacecost:25}},
+        {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,pulses:4,sell:0,id:2,name:"uranium4",replacecost:60}},
+        {name:"uranium8",gname:"Octo Uranium Cell ($140)",cost:140,default:{type:"cell",image:"uranium8",income:32,heat:128,power:15,capacity:0,pulses:8,sell:0,id:3,name:"uranium8",replacecost:140}},
+        {name:"plutonium1",gname:"Plutonium Cell ($500)",cost:500,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,sell:0,id:4,name:"plutonium1",replacecost:500}},
+        {name:"plutonium2",gname:"Dual Plutonium Cell ($1.25K)",cost:1250,default:{type:"cell",image:"plutonium2",income:300,heat:600,power:60,capacity:0,pulses:1,sell:0,id:5,name:"plutonium2",replacecost:1250}},
+        {name:"plutonium4",gname:"Quad Plutonium Cell ($3K)",cost:3000,default:{type:"cell",image:"plutonium4",income:1200,heat:5400,power:60,capacity:0,pulses:1,sell:0,id:6,name:"plutonium4",replacecost:3000}},
+        {name:"plutonium8",gname:"Plutonium Cell ($7K)",cost:7000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:1,sell:0,id:7,name:"plutonium8",replacecost:7000}},
+        {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}},
+        {name:"vent2",gname:"Advanced Vent ($1K)",cost:1000,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:1000}},
+        {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000}}]
+        window.itemstable={uranium1:0,uranium2:1}
+    }
+}
 function drawGrid(){
     context.beginPath()
     for(var i=30;i<canvas.width;i+=30){
@@ -55,7 +71,7 @@ function drawGrid(){
     }
 }
 function loadImages(){
-    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","vent1","cap1"]
+    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","vent1","vent2","cap1"]
     for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
@@ -72,9 +88,21 @@ function click(event){
     gridx=x;gridy=y
     x=x*scale+ooffset;y=y*scale+ooffset
     var object=items[item]
-    if(bux>=object.cost&&reactor[gridx][gridy].type=="empty"){
-        reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
-        updateBux(-object.cost)
+    cell=reactor[gridx][gridy]
+    switch(cell.type){
+        case "empty":
+            if(bux>=object.cost){
+                reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
+                updateBux(-object.cost)
+                updateAll()
+            }
+            break;
+        case "dcell":
+            if(bux>=cell.replacecost){
+                reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},items[itemstable[cell.name]].default)
+                updateBux(-cell.replacecost)
+            }
+        break;
     }
 }
 function rclick(event){
@@ -111,6 +139,7 @@ function prevItem(){
 function income(){
     buxpertick=0
     context.clearRect(0, 0, canvas.width, canvas.height)
+    resetValues(0)
     for(var i=0;i<reactor.length;i++){ //heat plus tick
         for(var j=0;j<reactor[i].length;j++){
             cell=reactor[i][j]
@@ -174,6 +203,8 @@ function income(){
                     }
                     break;
                 case "capacitor":
+                    context.drawImage(window[cell["image"]+"img"],cell["drawx"],cell["drawy"])
+                    maxpower+=cell.power
                     if(cell.heat>cell.capacity){
                         reactor[i][j]={type:"empty",explosion:4}
                     }
@@ -205,6 +236,12 @@ function updateHeat(amount){
     heat+=amount
     clampheat()
     update("heat","Heat: "+heat+"/1000")
+}
+function updateAll(){
+    updatePower(0)
+    updateHeat(0)
+    updateBux(0)
+    update("item",items[item].gname)
 }
 function addheat(x,y,heat){
     var cells=[]
