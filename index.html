@@ -2,10 +2,12 @@
 <span id="bux">Money: $10</span>
 <span id="power">Power: 0/100</span>
 <button onclick="sellpower()">Sell!</button>
-<span id="heat">Heat: 0/1000</span><br>
+<span id="heat">Heat: 0/1000</span>
+<button onclick="togglePause()" id="pause">Pause</button><br>
 <button onclick="prevItem()">&lt;</button>
 <span id="item">Uranium Cell (Click the grid!)</span>
 <button onclick="nextItem()">&gt;</button><br>
+<div id="tooltip">Generates 1 power and 1 heat per tick for 15 ticks.</div>
 <div>
 <canvas id="game" width=450 height=450 style="border:1px solid #000000;">
 You can't run the game :( ^ Update your browser to play ^
@@ -19,7 +21,7 @@ function run(){
     window.canvasleft=canvas.offsetLeft
     window.canvastop=canvas.offsetTop
     window.context=canvas.getContext("2d")
-    resetValues(2)
+    resetValues(3)
     window.item=0
     window.reactor=[]
     for(var i=0;i<=canvas.width/30;i++){
@@ -30,10 +32,10 @@ function run(){
     }
     canvas.onclick=click
     canvas.oncontextmenu=rclick
-    setInterval(income,500)
     drawGrid()
     context.stroke()
     loadImages()
+    unpause()
 }
 function resetValues(tier){
     window.maxpower=100
@@ -52,11 +54,18 @@ function resetValues(tier){
         {name:"plutonium1",gname:"Plutonium Cell ($500)",cost:500,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,sell:0,id:4,name:"plutonium1",replacecost:500}},
         {name:"plutonium2",gname:"Dual Plutonium Cell ($1.25K)",cost:1250,default:{type:"cell",image:"plutonium2",income:300,heat:600,power:60,capacity:0,pulses:1,sell:0,id:5,name:"plutonium2",replacecost:1250}},
         {name:"plutonium4",gname:"Quad Plutonium Cell ($3K)",cost:3000,default:{type:"cell",image:"plutonium4",income:1200,heat:5400,power:60,capacity:0,pulses:1,sell:0,id:6,name:"plutonium4",replacecost:3000}},
-        {name:"plutonium8",gname:"Plutonium Cell ($7K)",cost:7000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:1,sell:0,id:7,name:"plutonium8",replacecost:7000}},
+        {name:"plutonium8",gname:"Octo Plutonium Cell ($7K)",cost:7000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:1,sell:0,id:7,name:"plutonium8",replacecost:7000}},
         {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}},
         {name:"vent2",gname:"Advanced Vent ($1K)",cost:1000,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:1000}},
         {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000}}]
         window.itemstable={uranium1:0,uranium2:1}
+    }
+    if(tier>2){
+        window.tooltips={
+        cell:function(cell){return "Generates "+cell.income+" power and "+cell.heat+" heat per tick for "+cell.power+" ticks."},
+        vent:function(vent){return "Vents "+vent.vent+" heat per tick. Holds "+vent.capacity+" heat."},
+        capacitor:function(cap){return "Holds "+cap.power+" power and "+cap.capacity+" heat."}
+        }
     }
 }
 function drawGrid(){
@@ -127,14 +136,30 @@ function sellpower(){
     updatePower(-power)
 }
 function nextItem(){
-        item+=1
-        item%=items.length
-        update("item",items[item].gname)
+    item+=1
+    item%=items.length
+    updateItem(item)
 }
 function prevItem(){
-        if(!item){item=items.length}
-        item-=1
-        update("item",items[item].gname)
+    if(!item){item=items.length}
+    item-=1
+    updateItem(item)
+}
+function togglePause(){
+    if(tick==false){
+        unpause()
+    }else{
+        pause()
+    }
+}
+function pause(){
+    clearInterval(tick)
+    tick=false
+    update("pause","Unpause")
+}
+function unpause(){
+    tick=setInterval(income,500)
+    update("pause","Pause")
 }
 function income(){
     buxpertick=0
@@ -237,11 +262,15 @@ function updateHeat(amount){
     clampheat()
     update("heat","Heat: "+heat+"/1000")
 }
+function updateItem(item){
+    update("item",items[item].gname)
+    update("tooltip",tooltips[items[item].default.type].call(null,items[item].default))
+}
 function updateAll(){
     updatePower(0)
     updateHeat(0)
     updateBux(0)
-    update("item",items[item].gname)
+    updateItem(item)
 }
 function addheat(x,y,heat){
     var cells=[]
