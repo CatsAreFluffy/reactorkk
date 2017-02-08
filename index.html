@@ -15,6 +15,7 @@ You can't run the game :( ^ Update your browser to play ^
 </div>
 <br>
 Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
+<button onclick="updateBux(1e300)">Cheat</button>
 <script>
 function run(){
     window.canvas=document.getElementById("game")
@@ -57,6 +58,9 @@ function resetValues(tier){
         {name:"plutonium8",gname:"Octo Plutonium Cell ($7K)",cost:7000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:1,sell:0,id:7,name:"plutonium8",replacecost:7000}},
         {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}},
         {name:"vent2",gname:"Advanced Vent ($1K)",cost:1000,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:1000}},
+        {name:"vent3",gname:"Super Vent ($20K)",cost:20000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:20000}},
+        {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:16,capacity:0,sell:160}},
+        {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:16,capacity:0,sell:160}},
         {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000}}]
         window.itemstable={uranium1:0,uranium2:1}
     }
@@ -80,7 +84,7 @@ function drawGrid(){
     }
 }
 function loadImages(){
-    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","vent1","vent2","cap1"]
+    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","vent1","vent2","vent3","cap1","boom"]
     for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
@@ -169,19 +173,14 @@ function income(){
         for(var j=0;j<reactor[i].length;j++){
             cell=reactor[i][j]
             switch(cell.type){
-                case "empty":
-                    break;
                 case "cell":
-                    addheat(i,j,cell.heat)
+                    addheat(i,j,cell.heat,false)
                     break;
-                case "dcell":
-                    break;
-                case "vent":
-                    break;
-                case "capacitor":
-                    break;
+                case "outlet":
+                    heat-=cell.out
+                    addheat(i,j,cell.out,true)
                 default:
-                    console.log("Unexpected item: "+cell.type)
+                    break;
             }
         }
     }
@@ -189,20 +188,14 @@ function income(){
         for(var j=0;j<reactor[i].length;j++){
             cell=reactor[i][j]
             switch(cell.type){
-                case "empty":
-                    break;
-                case "cell":
-                    break;
-                case "dcell":
-                    break;
                 case "vent":
                     cell.heat-=cell.vent
                     if(cell.heat<0){cell.heat=0}
                     break;
-                case "capacitor":
-                    break;
+                case "inlet":
+                    heat+=removeheat(i,j,cell.in,true)
                 default:
-                    console.log("Unexpected item: "+cell.type)
+                    break;
             }
         }
     }
@@ -211,39 +204,37 @@ function income(){
             cell=reactor[i][j]
             switch(cell.type){
                 case "empty":
+                    if(cell.explosion>0){reactor[i][j].explosion--;context.drawImage(boomimg,cell.drawx,cell.drawy)}
                     break;
                 case "cell":
-                    context.drawImage(window[cell["image"]+"img"],cell["drawx"],cell["drawy"])
+                    context.drawImage(window[cell["image"]+"img"],cell.drawx,cell.drawy)
                     buxpertick+=cell["income"]
                     cell["power"]--
                     if(!cell["power"]){cell["type"]="dcell";cell["image"]+="d"}
                     break;
-                case "dcell":
-                    context.drawImage(window[cell["image"]+"img"],cell["drawx"],cell["drawy"])
-                    break;
                 case "vent":
                     context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
                     if(cell.heat>cell.capacity){
-                        reactor[i][j]={type:"empty",explosion:4}
+                        reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
                     }
                     break;
                 case "capacitor":
-                    context.drawImage(window[cell["image"]+"img"],cell["drawx"],cell["drawy"])
+                    context.drawImage(window[cell["image"]+"img"],cell.drawx,cell.drawy)
                     maxpower+=cell.power
                     if(cell.heat>cell.capacity){
-                        reactor[i][j]={type:"empty",explosion:4}
+                        reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
                     }
                     break;
                 default:
-                    console.log("Unexpected item: "+cell.type)
+                    ontext.drawImage(window[cell["image"]+"img"],cell.drawx,cell.drawy)
             }
-            if(heat>1000){reactor[i][j]={type:"empty",explosion:4}}
+            if(heat>2000&&cell.type!="empty"){reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
         }
     }
     drawGrid()
     context.stroke()
     updatePower(buxpertick)
-    updateHeat(-0.1)
+    updateHeat(Math.min((1000-heat)/50,-0.1))
 }
 function update(thing,value){
     document.getElementById(thing).innerHTML=value
@@ -272,7 +263,7 @@ function updateAll(){
     updateBux(0)
     updateItem(item)
 }
-function addheat(x,y,heat){
+function addheat(x,y,heat,peritem){
     var cells=[]
     if(x>0){cells.push(reactor[x-1][y])}
     if(y>0){cells.push(reactor[x][y-1])}
@@ -284,15 +275,36 @@ function addheat(x,y,heat){
     }
     if(heatcells.length){
         for(var i=0;i<heatcells.length;i++){
-            heatcells[i].heat+=heat/heatcells.length
+            heatcells[i].heat+=(peritem?heat:heat/heatcells.length)
         }
     }else{
         updateHeat(heat)
     }
 }
+function removeheat(x,y,maxheat,peritem){
+    var cells=[]
+    if(x>0){cells.push(reactor[x-1][y])}
+    if(y>0){cells.push(reactor[x][y-1])}
+    if(x<reactor.length-1){cells.push(reactor[x+1][y])}
+    if(y<reactor[0].length-1){cells.push(reactor[x][y+1])}
+    var heatcells=[]
+    for(var i=0;i<cells.length;i++){
+        if(cells[i].capacity>0){heatcells.push(cells[i])}
+    }
+    if(heatcells.length){
+        var pullheat=0
+        for(i=0;i<heatcells.length;i++){
+            pullheat+=Math.min(heatcells[i].heat,maxheat)
+            heatcells[i].heat-=Math.min(heatcells[i].heat,peritem?maxheat:maxheat/heatcells.length)
+        }
+    }else{
+        var pullheat=0
+    }
+    return pullheat
+}
 function clampheat(){
-        if(heat<0){heat=0}
-        heat=Math.round(heat*10)/10
+    if(heat<0){heat=0}
+    heat=Math.round(heat*10)/10
 }
     
 </script>
