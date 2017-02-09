@@ -5,8 +5,8 @@
 <span id="heat">Heat: 0/1000</span>
 <button onclick="togglePause()" id="pause">Pause</button><br>
 <button onclick="prevItem()">&lt;</button>
-<span id="item">Uranium Cell (Click the grid!)</span>
-<button onclick="nextItem()">&gt;</button><br>
+<button onclick="nextItem()">&gt;</button>
+<span id="item">Uranium Cell (Click the grid!)</span><br>
 <div id="tooltip">Generates 1 power and 1 heat per tick for 15 ticks.</div>
 <canvas id="game" width=450 height=450 style="border:1px solid #000000;">
 You can't run the game :( ^ Update your browser to play ^
@@ -18,7 +18,7 @@ You can't run the game :( ^ Update your browser to play ^
 </ul>
 <br>
 Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
-<button onclick="updateBux(1e300)">Cheat</button>
+<button onclick="updateBux(1e303)">Cheat</button>
 <script>
 function run(){
     window.canvas=document.getElementById("game")
@@ -93,7 +93,7 @@ function drawGrid(){
     }
 }
 function loadImages(){
-    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","vent1","vent2","vent3","cap1","boom"]
+    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","vent1","vent2","vent3","outlet1","inlet1","cap1","boom"]
     for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
