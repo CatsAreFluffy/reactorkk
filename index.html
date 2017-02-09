@@ -8,11 +8,14 @@
 <span id="item">Uranium Cell (Click the grid!)</span>
 <button onclick="nextItem()">&gt;</button><br>
 <div id="tooltip">Generates 1 power and 1 heat per tick for 15 ticks.</div>
-<div>
 <canvas id="game" width=450 height=450 style="border:1px solid #000000;">
 You can't run the game :( ^ Update your browser to play ^
 </canvas>
-</div>
+<ul>
+<li>Potent Uranium <span id="potent0v">0</span> <button id="potent0" onclick="buyPotent(0)">$500</button></li>
+<li>Potent Plutonium <span id="potent1v">0</span> <button id="potent1" onclick="buyPotent(1)">$30000</button></li>
+<li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button></li>
+</ul>
 <br>
 Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
 <button onclick="updateBux(1e300)">Cheat</button>
@@ -39,37 +42,42 @@ function run(){
     unpause()
 }
 function resetValues(tier){
+    //every tick
     window.maxpower=100
     window.buxpertick=0
-    if(tier>0){
+    if(tier>0){ //I forgot
         window.bux=10
         window.power=0
         window.heat=0
     }
-    if(tier>1){
+    if(tier>1){ //reboot
         window.items=[
-        {name:"uranium1",gname:"Uranium Cell ($10)",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,pulses:1,sell:0,name:"uranium1",replacecost:10}},
-        {name:"uranium2",gname:"Dual Uranium Cell ($25)",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,pulses:2,sell:0,name:"uranium2",replacecost:25}},
-        {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,pulses:4,sell:0,id:2,name:"uranium4",replacecost:60}},
-        {name:"uranium8",gname:"Octo Uranium Cell ($140)",cost:140,default:{type:"cell",image:"uranium8",income:32,heat:128,power:15,capacity:0,pulses:8,sell:0,id:3,name:"uranium8",replacecost:140}},
-        {name:"plutonium1",gname:"Plutonium Cell ($500)",cost:500,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,sell:0,id:4,name:"plutonium1",replacecost:500}},
-        {name:"plutonium2",gname:"Dual Plutonium Cell ($1.25K)",cost:1250,default:{type:"cell",image:"plutonium2",income:300,heat:600,power:60,capacity:0,pulses:1,sell:0,id:5,name:"plutonium2",replacecost:1250}},
-        {name:"plutonium4",gname:"Quad Plutonium Cell ($3K)",cost:3000,default:{type:"cell",image:"plutonium4",income:1200,heat:5400,power:60,capacity:0,pulses:1,sell:0,id:6,name:"plutonium4",replacecost:3000}},
-        {name:"plutonium8",gname:"Octo Plutonium Cell ($7K)",cost:7000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:1,sell:0,id:7,name:"plutonium8",replacecost:7000}},
-        {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50}},
-        {name:"vent2",gname:"Advanced Vent ($1K)",cost:1000,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:1000}},
-        {name:"vent3",gname:"Super Vent ($20K)",cost:20000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:20000}},
-        {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:16,capacity:0,sell:160}},
-        {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:16,capacity:0,sell:160}},
-        {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000}}]
-        window.itemstable={uranium1:0,uranium2:1}
+        {name:"uranium1",gname:"Uranium Cell ($10)",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,pulses:1,sell:0,tier:1,name:"uranium1",replacecost:10}},
+        {name:"uranium2",gname:"Dual Uranium Cell ($25)",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,pulses:2,sell:0,tier:1,name:"uranium2",replacecost:25}},
+        {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,pulses:4,sell:0,tier:1,id:2,name:"uranium4",replacecost:60}},
+        {name:"uranium8",gname:"Octo Uranium Cell ($140)",cost:140,default:{type:"cell",image:"uranium8",income:32,heat:128,power:15,capacity:0,pulses:8,sell:0,tier:1,id:3,name:"uranium8",replacecost:140}},
+        {name:"plutonium1",gname:"Plutonium Cell ($6K)",cost:6000,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,sell:0,tier:2,id:4,name:"plutonium1",replacecost:500}},
+        {name:"plutonium2",gname:"Dual Plutonium Cell ($15K)",cost:15000,default:{type:"cell",image:"plutonium2",income:300,heat:600,power:60,capacity:0,pulses:1,sell:0,tier:2,id:5,name:"plutonium2",replacecost:1250}},
+        {name:"plutonium4",gname:"Quad Plutonium Cell ($36K)",cost:36000,default:{type:"cell",image:"plutonium4",income:1200,heat:5400,power:60,capacity:0,pulses:1,sell:0,tier:2,id:6,name:"plutonium4",replacecost:3000}},
+        {name:"plutonium8",gname:"Octo Plutonium Cell ($84K)",cost:84000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:1,sell:0,tier:2,id:7,name:"plutonium8",replacecost:7000}},
+        {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50,tier:1}},
+        {name:"vent2",gname:"Advanced Vent ($12.5K)",cost:12500,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:1000,tier:2}},
+        {name:"vent3",gname:"Super Vent ($3.125M)",cost:3125000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:20000,tier:3}},
+        {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:16,capacity:0,sell:160,tier:1}},
+        {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:16,capacity:0,sell:160,tier:1}},
+        {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}}]
+        window.upgrades={potent:[0,0],generic:[0]}
     }
-    if(tier>2){
+    if(tier>2){ //restart game
         window.tooltips={
         cell:function(cell){return "Generates "+cell.income+" power and "+cell.heat+" heat per tick for "+cell.power+" ticks."},
         vent:function(vent){return "Vents "+vent.vent+" heat per tick. Holds "+vent.capacity+" heat."},
-        capacitor:function(cap){return "Holds "+cap.power+" power and "+cap.capacity+" heat."}
+        capacitor:function(cap){return "Holds "+cap.power+" power and "+cap.capacity+" heat."},
+        outlet:function(out){return "Adds "+out.out+" heat to adjacent components."},
+        inlet:function(in){return "Removes "+in.in+" heat from adjacent components."}
         }
+        window.cellcosts=[10,6000]
+        window.genericcosts=[100]
     }
 }
 function drawGrid(){
@@ -100,7 +108,7 @@ function click(event){
     x=Math.round(x);y=Math.round(y)
     gridx=x;gridy=y
     x=x*scale+ooffset;y=y*scale+ooffset
-    var object=items[item]
+    var object=currentItem()
     cell=reactor[gridx][gridy]
     switch(cell.type){
         case "empty":
@@ -207,10 +215,10 @@ function income(){
                     if(cell.explosion>0){reactor[i][j].explosion--;context.drawImage(boomimg,cell.drawx,cell.drawy)}
                     break;
                 case "cell":
-                    context.drawImage(window[cell["image"]+"img"],cell.drawx,cell.drawy)
-                    buxpertick+=cell["income"]
-                    cell["power"]--
-                    if(!cell["power"]){cell["type"]="dcell";cell["image"]+="d"}
+                    context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+                    buxpertick+=cell.income*(upgrades.potent[cell.tier-1]+1)
+                    cell.power--
+                    if(!cell.power){cell.type="dcell";cell.image+="d"}
                     break;
                 case "vent":
                     context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
@@ -219,14 +227,14 @@ function income(){
                     }
                     break;
                 case "capacitor":
-                    context.drawImage(window[cell["image"]+"img"],cell.drawx,cell.drawy)
+                    context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
                     maxpower+=cell.power
                     if(cell.heat>cell.capacity){
                         reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
                     }
                     break;
                 default:
-                    ontext.drawImage(window[cell["image"]+"img"],cell.drawx,cell.drawy)
+                    context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
             }
             if(heat>2000&&cell.type!="empty"){reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
         }
@@ -234,6 +242,9 @@ function income(){
     drawGrid()
     context.stroke()
     updatePower(buxpertick)
+    var autosell=maxpower/100*upgrades.generic[0]
+    updateBux(Math.min(autosell,power))
+    updatePower(-Math.min(autosell,power))
     updateHeat(Math.min((1000-heat)/50,-0.1))
 }
 function update(thing,value){
@@ -254,14 +265,17 @@ function updateHeat(amount){
     update("heat","Heat: "+heat+"/1000")
 }
 function updateItem(item){
-    update("item",items[item].gname)
-    update("tooltip",tooltips[items[item].default.type].call(null,items[item].default))
+    update("item",currentItem().gname)
+    update("tooltip",tooltips[currentItem().default.type].call(null,currentItem().default))
 }
 function updateAll(){
     updatePower(0)
     updateHeat(0)
     updateBux(0)
     updateItem(item)
+}
+function currentItem(){
+    return items[item]
 }
 function addheat(x,y,heat,peritem){
     var cells=[]
@@ -306,5 +320,34 @@ function clampheat(){
     if(heat<0){heat=0}
     heat=Math.round(heat*10)/10
 }
-    
+function buyPotent(tier){
+    if(bux>cellcosts[tier]*50*10**upgrades.potent[tier]){
+        updateBux(-(cellcosts[tier]*50*10**upgrades.potent[tier]))
+        upgrades.potent[tier]++
+        update("potent"+tier,"$"+cellcosts[tier]*50*10**upgrades.potent[tier])
+        update("potent"+tier+"v",upgrades.potent[tier])
+    }
+}
+function buyGeneric(upgrade){
+    switch(upgrade){
+        case 0:
+            if(bux>100**upgrades.generic[upgrade]){
+                updateBux(-(100**upgrades.generic[upgrade]))
+                upgrades.generic[upgrade]++
+                update("generic"+upgrade,"$"+100*10**upgrades.generic[upgrade])
+                update("generic"+upgrade+"v",upgrades.generic[upgrade])
+            }
+            break;
+    }
+}
+function upgrade(x){
+    switch(x.type){
+        case "cell":
+            x.income*=(upgrades.potent[x.tier-1]+1)
+            break;
+        default:
+            break;
+    }
+    return x
+}
 </script>
