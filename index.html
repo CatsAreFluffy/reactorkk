@@ -13,7 +13,9 @@ You can't run the game :( ^ Update your browser to play ^
 </canvas>
 <ul>
 <li>Potent Uranium <span id="potent0v">0</span> <button id="potent0" onclick="buyPotent(0)">$500</button></li>
+<li>Perpetual Uranium <span id="perpetual0v">0</span> <button id="perpetual0" onclick="buyPerpetual(0)">$1000</button></li>
 <li>Potent Plutonium <span id="potent1v">0</span> <button id="potent1" onclick="buyPotent(1)">$30000</button></li>
+<li>Perpetual Plutonium <span id="perpetual1v">0</span> <button id="perpetual1" onclick="buyPerpetual(1)">$60000</button></li>
 <li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button></li>
 </ul>
 <br>
@@ -66,8 +68,11 @@ function resetValues(tier){
         {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:16,capacity:0,sell:160,tier:1}},
         {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:16,capacity:0,sell:160,tier:1}},
         {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}}]
-        window.itemstable={uranium1:0,uranium2:1,uranium4:2,uranium8:3,plutonium1:4,plutonium2:5,plutonium4:6,plutonium8:7}
-        window.upgrades={potent:[0,0],generic:[0]}
+        window.itemstable={
+        uranium1:0,uranium2:1,uranium4:2,uranium8:3,
+        plutonium1:4,plutonium2:5,plutonium4:6,plutonium8:7,
+        thorium1:8,thorium2:9,thorium4:10,thorium8:11}
+        window.upgrades={potent:[0,0],perpetual:[0,0],generic:[0]}
     }
     if(tier>2){ //restart game
         window.tooltips={
@@ -100,6 +105,17 @@ function loadImages(){
     }
 }
 function click(event){
+    if(event.shiftKey){
+        replaceall(event)
+    }else{
+        buy(event)
+    }
+} 
+function rclick(event){
+    sell(event)
+    return false
+}
+function buy(event){
     var x=event.pageX-canvasleft
     var y=event.pageY-canvastop
     var ioffset=18
@@ -110,24 +126,48 @@ function click(event){
     gridx=x;gridy=y
     x=x*scale+ooffset;y=y*scale+ooffset
     var object=currentItem()
-    cell=reactor[gridx][gridy]
+    var cell=reactor[gridx][gridy]
     switch(cell.type){
         case "empty":
-            if(bux>=object.cost){
-                reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
-                updateBux(-object.cost)
-                updateAll()
-            }
+            buyitem(object,x,y,gridx,gridy)
             break;
         case "dcell":
-            if(bux>=cell.replacecost){
-                reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},items[itemstable[cell.name]].default)
-                updateBux(-cell.replacecost)
-            }
+            buyitem(items[itemstable[cell.name]],x,y,gridx,gridy)
         break;
     }
 }
-function rclick(event){
+function buyitem(object,x,y,gridx,gridy){
+    if(bux>=object.cost){
+        reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
+        updateBux(-object.cost)
+        updateAll()
+    }
+}
+function replaceall(event){
+    var x=event.pageX-canvasleft
+    var y=event.pageY-canvastop
+    var ioffset=18
+    var ooffset=3
+    var scale=30
+    x=(x-ioffset)/scale;y=(y-ioffset)/scale
+    x=Math.round(x);y=Math.round(y)
+    gridx=x;gridy=y
+    x=x*scale+ooffset;y=y*scale+ooffset
+    var image=reactor[gridx][gridy].image
+    for(var i=0;i<reactor.length;i++){
+        for(var j=0;j<reactor[i].length;j++){
+            var cell=reactor[i][j]
+            if(cell.image==image){
+                switch(cell.type){
+                    case "dcell":
+                        buyitem(items[itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
+                        break;
+                }
+            }
+        }
+    }
+}
+function sell(event){
     var x=event.pageX-canvasleft
     var y=event.pageY-canvastop
     var ioffset=18
@@ -142,7 +182,6 @@ function rclick(event){
         reactor[gridx][gridy]={type:"empty",explosion:0}
         updateBux(cell.sell)
     }
-    return false;
 }
 function sellpower(){
     updateBux(power)
@@ -186,8 +225,8 @@ function income(){
                     addheat(i,j,cell.heat,false)
                     break;
                 case "outlet":
-                    heat-=cell.out
-                    addheat(i,j,cell.out,true)
+                    heat-=Math.min(cell.out,heat)
+                    addheat(i,j,Math.min(cell.out,heat),true)
                 default:
                     break;
             }
@@ -219,7 +258,12 @@ function income(){
                     context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
                     buxpertick+=cell.income*(upgrades.potent[cell.tier-1]+1)
                     cell.power--
-                    if(!cell.power){cell.type="dcell";cell.image+="d"}
+                    if(!cell.power){
+                        cell.type="dcell";cell.image+="d"
+                        if(upgrades.perpetual[cell.tier-1]){
+                            buyitem(items[itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
+                        }
+                    }
                     break;
                 case "vent":
                     context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
@@ -327,6 +371,14 @@ function buyPotent(tier){
         upgrades.potent[tier]++
         update("potent"+tier,"$"+cellcosts[tier]*50*10**upgrades.potent[tier])
         update("potent"+tier+"v",upgrades.potent[tier])
+    }
+}
+function buyPerpetual(tier){
+    if(bux>cellcosts[tier]*100*10**upgrades.perpetual[tier]){
+        updateBux(-(cellcosts[tier]*100*10**upgrades.perpetual[tier]))
+        upgrades.perpetual[tier]++
+        update("perpetual"+tier,"$"+cellcosts[tier]*100*10**upgrades.perpetual[tier])
+        update("perpetual"+tier+"v",upgrades.perpetual[tier])
     }
 }
 function buyGeneric(upgrade){
