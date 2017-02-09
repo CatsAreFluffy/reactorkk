@@ -3,7 +3,7 @@ A knockoff of a knockoff of a knockoff (jk) of a small component of a Minecraft 
 
 Coming in 0.3:
 * Perpetual cells!
-* Thorium!
+* Shiftclick replace!
 * Pulses!
 
 Coming at some point:
