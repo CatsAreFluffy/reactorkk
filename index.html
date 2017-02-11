@@ -471,7 +471,7 @@ function buyGeneric(upgrade){
             if(bux>Math.pow(100,upgrades.generic[upgrade])){
                 updateBux(-Math.pow(100,upgrades.generic[upgrade]))
                 upgrades.generic[upgrade]++
-                update("generic"+upgrade,"$"+100*10**upgrades.generic[upgrade])
+                update("generic"+upgrade,"$"+100*Math.pow(10,upgrades.generic[upgrade]))
                 update("generic"+upgrade+"v",upgrades.generic[upgrade])
             }
             break;
