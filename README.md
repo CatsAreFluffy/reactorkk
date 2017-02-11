@@ -4,9 +4,9 @@ A knockoff of a knockoff of a knockoff (jk) of a small component of a Minecraft 
 Made by me (CatsAreFluffy) and [Makeworld](https://scratch.mit.edu/users/MAKEWORLD/)
 
 Coming in 0.3.1:
-
-* I don't know!
-* You choose!
+* Fix pausing bugs!
+* Shiftclick upgrade/replace!
+* Part type selector!
 
 Coming at some point:
 * New part types!
