@@ -3,7 +3,10 @@
 <span id="power">Power: 0/100</span>
 <button onclick="sellpower()">Sell!</button>
 <span id="heat">Heat: 0/1000</span>
-<button onclick="togglePause()" id="pause">Pause</button><button onclick="tooglePerpetual()" id="perpetual">Disable perpetual cells</button><br>
+<button onclick="togglePause()" id="pause">Pause</button><button onclick="togglePerpetual()" id="perpetual">Disable perpetual cells</button><br>
+<button onclick="prevType()">&lt;</button>
+<button onclick="nextType()">&gt;</button>
+<span id="type">Cells</span><br>
 <button onclick="prevItem()">&lt;</button>
 <button onclick="nextItem()">&gt;</button>
 <span id="item">Uranium Cell (Click the grid!)</span><br>
@@ -29,6 +32,8 @@ function run(){
     window.context=canvas.getContext("2d")
     resetValues(3)
     window.item=0
+    window.type=0
+    window.autosell=0
     window.reactor=[]
     for(var i=0;i<=canvas.width/30;i++){
         reactor.push([])
@@ -57,6 +62,7 @@ function resetValues(tier){
     }
     if(tier>1){ //reboot
         window.items=[
+        [
         {name:"uranium1",gname:"Uranium Cell ($10)",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,pulses:1,pulse:0,sell:0,tier:1,name:"uranium1",replacecost:10}},
         {name:"uranium2",gname:"Dual Uranium Cell ($25)",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,pulses:2,pulse:0,sell:0,tier:1,name:"uranium2",replacecost:25}},
         {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,pulses:4,pulse:0,sell:0,tier:1,id:2,name:"uranium4",replacecost:60}},
@@ -64,16 +70,21 @@ function resetValues(tier){
         {name:"plutonium1",gname:"Plutonium Cell ($6K)",cost:6000,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,pulse:0,sell:0,tier:2,id:4,name:"plutonium1",replacecost:500}},
         {name:"plutonium2",gname:"Dual Plutonium Cell ($15K)",cost:15000,default:{type:"cell",image:"plutonium2",income:300,heat:600,power:60,capacity:0,pulses:2,pulse:0,sell:0,tier:2,id:5,name:"plutonium2",replacecost:1250}},
         {name:"plutonium4",gname:"Quad Plutonium Cell ($36K)",cost:36000,default:{type:"cell",image:"plutonium4",income:1200,heat:5400,power:60,capacity:0,pulses:4,pulse:0,sell:0,tier:2,id:6,name:"plutonium4",replacecost:3000}},
-        {name:"plutonium8",gname:"Octo Plutonium Cell ($84K)",cost:84000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:8,pulse:0,sell:0,tier:2,id:7,name:"plutonium8",replacecost:7000}},
+        {name:"plutonium8",gname:"Octo Plutonium Cell ($84K)",cost:84000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:8,pulse:0,sell:0,tier:2,id:7,name:"plutonium8",replacecost:7000}}
+        ],[
         {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50,tier:1}},
         {name:"vent2",gname:"Advanced Vent ($12.5K)",cost:12500,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:1000,tier:2}},
         {name:"vent3",gname:"Super Vent ($3.125M)",cost:3125000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:20000,tier:3}},
+        ],[
         {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:16,capacity:0,sell:160,tier:1}},
         {name:"outlet2",gname:"Advanced Outlet ($32K)",cost:32000,default:{type:"outlet",image:"outlet2",out:1200,capacity:0,sell:32000,tier:2}},
         {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:16,capacity:0,sell:160,tier:1}},
-        {name:"inlet2",gname:"Advanced Inlet ($32K)",cost:32000,default:{type:"inlet",image:"inlet2",in:1200,capacity:0,sell:32000,tier:2}},
+        {name:"inlet2",gname:"Advanced Inlet ($32K)",cost:32000,default:{type:"inlet",image:"inlet2",in:1200,capacity:0,sell:32000,tier:2}}
+        ],[
         {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}},
-        {name:"cap1",gname:"Advanced Capacitor ($160K)",cost:160000,default:{type:"capacitor",image:"cap2",power:14000,capacity:50,heat:0,sell:1000,tier:1}}]
+        {name:"cap1",gname:"Advanced Capacitor ($160K)",cost:160000,default:{type:"capacitor",image:"cap2",power:14000,capacity:50,heat:0,sell:1000,tier:1}}
+        ]]
+        window.types=["Cells","Vents","In/Outlets","Capacitors"]
         window.itemstable={
         uranium1:0,uranium2:1,uranium4:2,uranium8:3,
         plutonium1:4,plutonium2:5,plutonium4:6,plutonium8:7,
@@ -138,7 +149,7 @@ function buy(event){
             buyitem(object,x,y,gridx,gridy)
             break;
         case "dcell":
-            buyitem(items[itemstable[cell.name]],x,y,gridx,gridy)
+            buyitem(items[0][itemstable[cell.name]],x,y,gridx,gridy)
         break;
     }
 }
@@ -147,6 +158,12 @@ function buyitem(object,x,y,gridx,gridy){
         reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
         updateBux(-object.cost)
         updateAll()
+    }
+}
+function sellitem(x,y){
+    if(reactor[x][y].type!="empty"){
+        reactor[x][y]={type:"empty",explosion:0}
+        updateBux(cell.sell)
     }
 }
 function replaceall(event){
@@ -163,12 +180,10 @@ function replaceall(event){
     for(var i=0;i<reactor.length;i++){
         for(var j=0;j<reactor[i].length;j++){
             var cell=reactor[i][j]
-            if(cell.image==image){
-                switch(cell.type){
-                    case "dcell":
-                        buyitem(items[itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
-                        break;
-                }
+            if(cell.image==image&&cell.type=="dcell"){
+                buyitem(items[0][itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
+            }else if(cell.image==image){
+                buyitem(currentItem(),cell.drawx,cell.drawy,i,j)
             }
         }
     }
@@ -185,8 +200,7 @@ function sell(event){
     x=x*scale+ooffset;y=y*scale+ooffset
     var cell=reactor[gridx][gridy]
     if(cell.type!="empty"){
-        reactor[gridx][gridy]={type:"empty",explosion:0}
-        updateBux(cell.sell)
+        sellitem(gridx,gridy)
     }
 }
 function sellpower(){
@@ -195,15 +209,25 @@ function sellpower(){
 }
 function nextItem(){
     item+=1
-    item%=items.length
+    item%=items[type].length
     updateItem(item)
 }
 function prevItem(){
-    if(!item){item=items.length}
+    if(!item){item=items[type].length}
     item-=1
     updateItem(item)
 }
-function tooglePerpetual(){
+function nextType(){
+    type+=1
+    type%=types.length
+    updateType(type)
+}
+function prevType(){
+    if(!type){type=types.length}
+    type-=1
+    updateType(type)
+}
+function togglePerpetual(){
     perpetual=!perpetual
     if(perpetual){
         update("perpetual","Disable perpetual cells")
@@ -248,7 +272,7 @@ function income(){
                 cell=reactor[i][j]
                 switch(cell.type){
                     case "cell":
-                        addheat(i,j,cell.heat*(cell.pulse+1)**2,false)
+                        addheat(i,j,cell.heat*Math.pow(cell.pulse+1,2),false)
                         break;
                     case "outlet":
                         heat-=Math.min(cell.out,heat)
@@ -288,7 +312,7 @@ function income(){
                         if(!cell.power){
                             cell.type="dcell";cell.image+="d"
                             if(upgrades.perpetual[cell.tier-1]&&perpetual){
-                                buyitem(items[itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
+                                buyitem(items[0][itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
                             }
                         }
                         break;
@@ -300,7 +324,6 @@ function income(){
                         break;
                     case "capacitor":
                         context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
-                        maxpower+=cell.power
                         if(cell.heat>cell.capacity){
                             reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
                         }
@@ -311,22 +334,24 @@ function income(){
                 if(heat>2000&&cell.type!="empty"){reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
             }
         }
+        updatePower(-Math.min(autosell,power))
+        updateHeat(Math.min((1000-heat)/50,-0.1))
     }
-    for(var i=0;i<reactor.length;i++){ //render tick
+    for(var i=0;i<reactor.length;i++){ //render/capacity tick
         for(var j=0;j<reactor[i].length;j++){
             cell=reactor[i][j]
             if(cell.type!="empty"){
                 context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+            }
+            if(cell.type=="capacitor"){
+                maxpower+=cell.power
             }
         }
     }
     drawGrid()
     context.stroke()
     updatePower(buxpertick)
-    var autosell=maxpower/100*upgrades.generic[0]
-    updateBux(Math.min(autosell,power))
-    updatePower(-Math.min(autosell,power))
-    updateHeat(Math.min((1000-heat)/50,-0.1))
+    window.autosell=maxpower/100*upgrades.generic[0]
 }
 function update(thing,value){
     document.getElementById(thing).innerHTML=value
@@ -349,14 +374,19 @@ function updateItem(item){
     update("item",currentItem().gname)
     update("tooltip",tooltips[currentItem().default.type].call(null,currentItem().default))
 }
+function updateType(type){
+    update("type",types[type])
+    updateItem(item)
+}
 function updateAll(){
     updatePower(0)
     updateHeat(0)
     updateBux(0)
     updateItem(item)
+    updateType(type)
 }
 function currentItem(){
-    return items[item]
+    return items[type][item]
 }
 function addheat(x,y,heat,peritem){
     var cells=[]
@@ -420,26 +450,26 @@ function clampheat(){
     heat=Math.round(heat*10)/10
 }
 function buyPotent(tier){
-    if(bux>cellcosts[tier]*50*10**upgrades.potent[tier]){
-        updateBux(-(cellcosts[tier]*50*10**upgrades.potent[tier]))
+    if(bux>cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])){
+        updateBux(-(cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])))
         upgrades.potent[tier]++
-        update("potent"+tier,"$"+cellcosts[tier]*50*10**upgrades.potent[tier])
+        update("potent"+tier,"$"+cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier]))
         update("potent"+tier+"v",upgrades.potent[tier])
     }
 }
 function buyPerpetual(tier){
-    if(bux>cellcosts[tier]*100*10**upgrades.perpetual[tier]){
-        updateBux(-(cellcosts[tier]*100*10**upgrades.perpetual[tier]))
+    if(bux>cellcosts[tier]*100&&!upgrades.perpetual(tier)){
+        updateBux(-(cellcosts[tier]*100))
         upgrades.perpetual[tier]++
-        update("perpetual"+tier,"$"+cellcosts[tier]*100*10**upgrades.perpetual[tier])
+        update("perpetual"+tier,"Purchased")
         update("perpetual"+tier+"v",upgrades.perpetual[tier])
     }
 }
 function buyGeneric(upgrade){
     switch(upgrade){
         case 0:
-            if(bux>100**upgrades.generic[upgrade]){
-                updateBux(-(100**upgrades.generic[upgrade]))
+            if(bux>Math.pow(100,upgrades.generic[upgrade])){
+                updateBux(-Math.pow(100,upgrades.generic[upgrade]))
                 upgrades.generic[upgrade]++
                 update("generic"+upgrade,"$"+100*10**upgrades.generic[upgrade])
                 update("generic"+upgrade+"v",upgrades.generic[upgrade])
