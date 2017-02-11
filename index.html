@@ -3,7 +3,7 @@
 <span id="power">Power: 0/100</span>
 <button onclick="sellpower()">Sell!</button>
 <span id="heat">Heat: 0/1000</span>
-<button onclick="togglePause()" id="pause">Pause</button><br>
+<button onclick="togglePause()" id="pause">Pause</button><button onclick="tooglePerpetual()" id="perpetual">Disable perpetual cells</button><br>
 <button onclick="prevItem()">&lt;</button>
 <button onclick="nextItem()">&gt;</button>
 <span id="item">Uranium Cell (Click the grid!)</span><br>
@@ -14,8 +14,8 @@ You can't run the game :( ^ Update your browser to play ^
 <ul>
 <li>Potent Uranium <span id="potent0v">0</span> <button id="potent0" onclick="buyPotent(0)">$500</button></li>
 <li>Perpetual Uranium <span id="perpetual0v">0</span> <button id="perpetual0" onclick="buyPerpetual(0)">$1000</button></li>
-<li>Potent Plutonium <span id="potent1v">0</span> <button id="potent1" onclick="buyPotent(1)">$30000</button></li>
-<li>Perpetual Plutonium <span id="perpetual1v">0</span> <button id="perpetual1" onclick="buyPerpetual(1)">$60000</button></li>
+<li>Potent Plutonium <span id="potent1v">0</span> <button id="potent1" onclick="buyPotent(1)">$300000</button></li>
+<li>Perpetual Plutonium <span id="perpetual1v">0</span> <button id="perpetual1" onclick="buyPerpetual(1)">$600000</button></li>
 <li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button></li>
 </ul>
 <br>
@@ -36,6 +36,9 @@ function run(){
             reactor[reactor.length-1].push({type:"empty",explosion:0})
         }
     }
+    window.perpetual=true
+    window.run=true
+    window.tick=setInterval(income,500)
     canvas.onclick=click
     canvas.oncontextmenu=rclick
     drawGrid()
@@ -54,20 +57,23 @@ function resetValues(tier){
     }
     if(tier>1){ //reboot
         window.items=[
-        {name:"uranium1",gname:"Uranium Cell ($10)",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,pulses:1,sell:0,tier:1,name:"uranium1",replacecost:10}},
-        {name:"uranium2",gname:"Dual Uranium Cell ($25)",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,pulses:2,sell:0,tier:1,name:"uranium2",replacecost:25}},
-        {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,pulses:4,sell:0,tier:1,id:2,name:"uranium4",replacecost:60}},
-        {name:"uranium8",gname:"Octo Uranium Cell ($140)",cost:140,default:{type:"cell",image:"uranium8",income:32,heat:128,power:15,capacity:0,pulses:8,sell:0,tier:1,id:3,name:"uranium8",replacecost:140}},
-        {name:"plutonium1",gname:"Plutonium Cell ($6K)",cost:6000,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,sell:0,tier:2,id:4,name:"plutonium1",replacecost:500}},
-        {name:"plutonium2",gname:"Dual Plutonium Cell ($15K)",cost:15000,default:{type:"cell",image:"plutonium2",income:300,heat:600,power:60,capacity:0,pulses:1,sell:0,tier:2,id:5,name:"plutonium2",replacecost:1250}},
-        {name:"plutonium4",gname:"Quad Plutonium Cell ($36K)",cost:36000,default:{type:"cell",image:"plutonium4",income:1200,heat:5400,power:60,capacity:0,pulses:1,sell:0,tier:2,id:6,name:"plutonium4",replacecost:3000}},
-        {name:"plutonium8",gname:"Octo Plutonium Cell ($84K)",cost:84000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:1,sell:0,tier:2,id:7,name:"plutonium8",replacecost:7000}},
+        {name:"uranium1",gname:"Uranium Cell ($10)",cost:10,default:{type:"cell",image:"uranium1",income:1,heat:1,power:15,capacity:0,pulses:1,pulse:0,sell:0,tier:1,name:"uranium1",replacecost:10}},
+        {name:"uranium2",gname:"Dual Uranium Cell ($25)",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,pulses:2,pulse:0,sell:0,tier:1,name:"uranium2",replacecost:25}},
+        {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,pulses:4,pulse:0,sell:0,tier:1,id:2,name:"uranium4",replacecost:60}},
+        {name:"uranium8",gname:"Octo Uranium Cell ($140)",cost:140,default:{type:"cell",image:"uranium8",income:32,heat:128,power:15,capacity:0,pulses:8,pulse:0,sell:0,tier:1,id:3,name:"uranium8",replacecost:140}},
+        {name:"plutonium1",gname:"Plutonium Cell ($6K)",cost:6000,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,pulse:0,sell:0,tier:2,id:4,name:"plutonium1",replacecost:500}},
+        {name:"plutonium2",gname:"Dual Plutonium Cell ($15K)",cost:15000,default:{type:"cell",image:"plutonium2",income:300,heat:600,power:60,capacity:0,pulses:2,pulse:0,sell:0,tier:2,id:5,name:"plutonium2",replacecost:1250}},
+        {name:"plutonium4",gname:"Quad Plutonium Cell ($36K)",cost:36000,default:{type:"cell",image:"plutonium4",income:1200,heat:5400,power:60,capacity:0,pulses:4,pulse:0,sell:0,tier:2,id:6,name:"plutonium4",replacecost:3000}},
+        {name:"plutonium8",gname:"Octo Plutonium Cell ($84K)",cost:84000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:8,pulse:0,sell:0,tier:2,id:7,name:"plutonium8",replacecost:7000}},
         {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50,tier:1}},
         {name:"vent2",gname:"Advanced Vent ($12.5K)",cost:12500,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:1000,tier:2}},
         {name:"vent3",gname:"Super Vent ($3.125M)",cost:3125000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:20000,tier:3}},
         {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:16,capacity:0,sell:160,tier:1}},
+        {name:"outlet2",gname:"Advanced Outlet ($32K)",cost:32000,default:{type:"outlet",image:"outlet2",out:1200,capacity:0,sell:32000,tier:2}},
         {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:16,capacity:0,sell:160,tier:1}},
-        {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}}]
+        {name:"inlet2",gname:"Advanced Inlet ($32K)",cost:32000,default:{type:"inlet",image:"inlet2",in:1200,capacity:0,sell:32000,tier:2}},
+        {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}},
+        {name:"cap1",gname:"Advanced Capacitor ($160K)",cost:160000,default:{type:"capacitor",image:"cap2",power:14000,capacity:50,heat:0,sell:1000,tier:1}}]
         window.itemstable={
         uranium1:0,uranium2:1,uranium4:2,uranium8:3,
         plutonium1:4,plutonium2:5,plutonium4:6,plutonium8:7,
@@ -98,7 +104,7 @@ function drawGrid(){
     }
 }
 function loadImages(){
-    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","vent1","vent2","vent3","outlet1","inlet1","cap1","boom"]
+    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","vent1","vent2","vent3","outlet1","outlet2","inlet1","inlet2","cap1","cap2","boom"]
     for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
@@ -197,91 +203,121 @@ function prevItem(){
     item-=1
     updateItem(item)
 }
+function tooglePerpetual(){
+    perpetual=!perpetual
+    if(perpetual){
+        update("perpetual","Disable perpetual cells")
+    }else{
+        update("perpetual","Enable perpetual cells")
+    }
+}
 function togglePause(){
-    if(tick==false){
+    if(!run){
         unpause()
     }else{
         pause()
     }
 }
 function pause(){
-    clearInterval(tick)
-    tick=false
+    run=false
     update("pause","Unpause")
 }
 function unpause(){
-    tick=setInterval(income,500)
+    run=true
     update("pause","Pause")
 }
 function income(){
     buxpertick=0
     context.clearRect(0, 0, canvas.width, canvas.height)
     resetValues(0)
-    for(var i=0;i<reactor.length;i++){ //heat plus tick
-        for(var j=0;j<reactor[i].length;j++){
-            cell=reactor[i][j]
-            switch(cell.type){
-                case "cell":
-                    addheat(i,j,cell.heat,false)
-                    break;
-                case "outlet":
-                    heat-=Math.min(cell.out,heat)
-                    addheat(i,j,Math.min(cell.out,heat),true)
-                default:
-                    break;
+    if(run){
+        for(var i=0;i<reactor.length;i++){ //pulses tick
+            for(var j=0;j<reactor[i].length;j++){
+                cell=reactor[i][j]
+                switch(cell.type){
+                    case "cell":
+                        addpulse(i,j,cell.pulses)
+                        break;
+                    default:
+                        break;
+                }
             }
         }
-    }
-    for(var i=0;i<reactor.length;i++){ //heat minus tick
-        for(var j=0;j<reactor[i].length;j++){
-            cell=reactor[i][j]
-            switch(cell.type){
-                case "vent":
-                    cell.heat-=cell.vent
-                    if(cell.heat<0){cell.heat=0}
-                    break;
-                case "inlet":
-                    heat+=removeheat(i,j,cell.in,true)
-                default:
-                    break;
+        for(var i=0;i<reactor.length;i++){ //heat plus tick
+            for(var j=0;j<reactor[i].length;j++){
+                cell=reactor[i][j]
+                switch(cell.type){
+                    case "cell":
+                        addheat(i,j,cell.heat*(cell.pulse+1)**2,false)
+                        break;
+                    case "outlet":
+                        heat-=Math.min(cell.out,heat)
+                        addheat(i,j,Math.min(cell.out,heat),true)
+                    default:
+                        break;
+                }
             }
         }
-    }
-    for(var i=0;i<reactor.length;i++){ //generic tick
-        for(var j=0;j<reactor[i].length;j++){
-            cell=reactor[i][j]
-            switch(cell.type){
-                case "empty":
-                    if(cell.explosion>0){reactor[i][j].explosion--;context.drawImage(boomimg,cell.drawx,cell.drawy)}
+        for(var i=0;i<reactor.length;i++){ //heat minus tick
+            for(var j=0;j<reactor[i].length;j++){
+                cell=reactor[i][j]
+                switch(cell.type){
+                    case "vent":
+                        cell.heat-=cell.vent
+                        if(cell.heat<0){cell.heat=0}
+                        break;
+                    case "inlet":
+                        heat+=removeheat(i,j,cell.in,true)
+                    default:
+                        break;
+                }
+            }
+        }
+        for(var i=0;i<reactor.length;i++){ //action tick
+            for(var j=0;j<reactor[i].length;j++){
+                cell=reactor[i][j]
+                switch(cell.type){
+                    case "empty":
+                        if(cell.explosion>0){reactor[i][j].explosion--;context.drawImage(boomimg,cell.drawx,cell.drawy)}
                     break;
-                case "cell":
-                    context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
-                    buxpertick+=cell.income*(upgrades.potent[cell.tier-1]+1)
-                    cell.power--
-                    if(!cell.power){
-                        cell.type="dcell";cell.image+="d"
-                        if(upgrades.perpetual[cell.tier-1]){
-                            buyitem(items[itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
+                    case "cell":
+                        context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+                        buxpertick+=cell.income*(upgrades.potent[cell.tier-1]+1)*(cell.pulse+1)
+                        cell.pulse=0
+                        cell.power--
+                        if(!cell.power){
+                            cell.type="dcell";cell.image+="d"
+                            if(upgrades.perpetual[cell.tier-1]&&perpetual){
+                                buyitem(items[itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
+                            }
                         }
-                    }
-                    break;
-                case "vent":
-                    context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
-                    if(cell.heat>cell.capacity){
-                        reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
-                    }
-                    break;
-                case "capacitor":
-                    context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
-                    maxpower+=cell.power
-                    if(cell.heat>cell.capacity){
-                        reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
-                    }
-                    break;
-                default:
-                    context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+                        break;
+                    case "vent":
+                        context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+                        if(cell.heat>cell.capacity){
+                            reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
+                        }
+                        break;
+                    case "capacitor":
+                        context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+                        maxpower+=cell.power
+                        if(cell.heat>cell.capacity){
+                            reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
+                        }
+                        break;
+                    default:
+                        context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+                }
+                if(heat>2000&&cell.type!="empty"){reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
             }
-            if(heat>2000&&cell.type!="empty"){reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
+        }
+    }
+    for(var i=0;i<reactor.length;i++){ //render tick
+        for(var j=0;j<reactor[i].length;j++){
+            cell=reactor[i][j]
+            if(cell.type!="empty"){
+                context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+            }
         }
     }
     drawGrid()
@@ -338,6 +374,24 @@ function addheat(x,y,heat,peritem){
         }
     }else{
         updateHeat(heat)
+    }
+}
+function addpulse(x,y,heat){
+    var cells=[]
+    if(x>0){cells.push(reactor[x-1][y])}
+    if(y>0){cells.push(reactor[x][y-1])}
+    if(x<reactor.length-1){cells.push(reactor[x+1][y])}
+    if(y<reactor[0].length-1){cells.push(reactor[x][y+1])}
+    var heatcells=[]
+    for(var i=0;i<cells.length;i++){
+        if(cells[i].type=="cell"){heatcells.push(cells[i])}
+    }
+    if(heatcells.length){
+        for(var i=0;i<heatcells.length;i++){
+            heatcells[i].pulse++
+        }
+    }else{
+        //...nothing? k
     }
 }
 function removeheat(x,y,maxheat,peritem){
