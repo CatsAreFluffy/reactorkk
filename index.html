@@ -162,8 +162,8 @@ function buyitem(object,x,y,gridx,gridy){
 }
 function sellitem(x,y){
     if(reactor[x][y].type!="empty"){
+        updateBux(reactor[x][y].sell)
         reactor[x][y]={type:"empty",explosion:0}
-        updateBux(cell.sell)
     }
 }
 function replaceall(event){
