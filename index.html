@@ -4,7 +4,6 @@
 <button onclick="sellpower()">Sell!</button>
 <span id="heat">Heat: 0/1000</span>
 <button onclick="togglePause()" id="pause">Pause</button><button onclick="togglePerpetual()" id="perpetual">Disable perpetual cells</button><br>
-Objective: <span id="objective">Place a cell ($10)</span><br>
 <button onclick="prevType()">&lt;</button>
 <button onclick="nextType()">&gt;</button>
 <span id="type">Cells</span><br>
@@ -45,8 +44,6 @@ function run(){
     window.perpetual=true
     window.run=true
     window.tick=setInterval(income,500)
-    window.objective=0
-    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)"]
     canvas.onclick=click
     canvas.oncontextmenu=rclick
     drawGrid()
@@ -490,8 +487,5 @@ function upgrade(x){
             break;
     }
     return x
-}
-function checkObjectives(){
-    switch object
 }
 </script>
