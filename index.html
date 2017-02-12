@@ -253,6 +253,7 @@ function unpause(){
 function income(){
     buxpertick=0
     context.clearRect(0, 0, canvas.width, canvas.height)
+    buxpertick=0
     if(run){
         for(var i=0;i<reactor.length;i++){ //pulses tick
             for(var j=0;j<reactor[i].length;j++){
@@ -337,7 +338,7 @@ function income(){
         updatePower(-Math.min(autosell,power))
         updateHeat(Math.min((1000-heat)/50,-0.1))
     }
-    resetValues(0)
+    maxpower=0
     for(var i=0;i<reactor.length;i++){ //render/capacity tick
         for(var j=0;j<reactor[i].length;j++){
             cell=reactor[i][j]
