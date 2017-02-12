@@ -460,7 +460,7 @@ function buyPotent(tier){
     }
 }
 function buyPerpetual(tier){
-    if(bux>cellcosts[tier]*100&&!upgrades.perpetual(tier)){
+    if(bux>cellcosts[tier]*100&&!upgrades.perpetual[tier]){
         updateBux(-(cellcosts[tier]*100))
         upgrades.perpetual[tier]++
         update("perpetual"+tier,"Purchased")
