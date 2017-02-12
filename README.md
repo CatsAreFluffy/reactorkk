@@ -3,10 +3,14 @@ A knockoff of a knockoff of a knockoff (jk) of a small component of a Minecraft 
 
 Made by me (CatsAreFluffy) and [Makeworld](https://scratch.mit.edu/users/MAKEWORLD/)
 
-Coming in 0.3.1:
-* Fix pausing bugs!
-* Shiftclick upgrade/replace!
-* Part type selector!
+Coming in 0.3.2:
+* Vent/outlet upgrades!
+* Outlets don't blow your vents!
+* Fix selection bugs!
+* Secret feature!
+
+Coming sometime soon:
+* Heat exchangers!
 
 Coming at some point:
 * New part types!
