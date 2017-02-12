@@ -338,7 +338,7 @@ function income(){
         updatePower(-Math.min(autosell,power))
         updateHeat(Math.min((1000-heat)/50,-0.1))
     }
-    maxpower=0
+    maxpower=100
     for(var i=0;i<reactor.length;i++){ //render/capacity tick
         for(var j=0;j<reactor[i].length;j++){
             cell=reactor[i][j]
