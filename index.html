@@ -164,7 +164,7 @@ function buyitem(object,x,y,gridx,gridy){
     if(bux>=object.cost){
         reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
         tracker.boughtitem++
-        if(object.type=="vent"){tracker.boughtvent++}
+        if(object.default.type=="vent"){tracker.boughtvent++}
         updateBux(-object.cost)
         updateAll()
     }
