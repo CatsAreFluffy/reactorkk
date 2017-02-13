@@ -2,8 +2,9 @@
 <span id="bux">Money: $10</span>
 <span id="power">Power: 0/100</span>
 <button onclick="sellpower()">Sell!</button>
-<span id="heat">Heat: 0/1000</span>
+<span id="heat">Heat: 0/1000</span> <button onclick="heat-=1">-1 Heat</button><br>
 <button onclick="togglePause()" id="pause">Pause</button><button onclick="togglePerpetual()" id="perpetual">Disable perpetual cells</button><br>
+Objective: <span id="objective">Place a cell ($10)</span><br>
 <button onclick="prevType()">&lt;</button>
 <button onclick="nextType()">&gt;</button>
 <span id="type">Cells</span><br>
@@ -20,6 +21,8 @@ You can't run the game :( ^ Update your browser to play ^
 <li>Potent Plutonium <span id="potent1v">0</span> <button id="potent1" onclick="buyPotent(1)">$300000</button></li>
 <li>Perpetual Plutonium <span id="perpetual1v">0</span> <button id="perpetual1" onclick="buyPerpetual(1)">$600000</button></li>
 <li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button></li>
+<li>Improved Vents <span id="generic1v">0</span> <button id="generic1" onclick="buyGeneric(1)">$250</button></li>
+<li>Improved Heat Transfer <span id="generic2v">0</span> <button id="generic2" onclick="buyGeneric(2)">$600</button></li>
 </ul>
 <br>
 Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
@@ -44,6 +47,9 @@ function run(){
     window.perpetual=true
     window.run=true
     window.tick=setInterval(income,500)
+    window.objective=0
+    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","All objectives completed! (for now...)"]
+    window.rewards=[10,10,10,50,10000000000]
     canvas.onclick=click
     canvas.oncontextmenu=rclick
     drawGrid()
@@ -76,10 +82,10 @@ function resetValues(tier){
         {name:"vent2",gname:"Advanced Vent ($12.5K)",cost:12500,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:1000,tier:2}},
         {name:"vent3",gname:"Super Vent ($3.125M)",cost:3125000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:20000,tier:3}},
         ],[
-        {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:16,capacity:0,sell:160,tier:1}},
-        {name:"outlet2",gname:"Advanced Outlet ($32K)",cost:32000,default:{type:"outlet",image:"outlet2",out:1200,capacity:0,sell:32000,tier:2}},
-        {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:16,capacity:0,sell:160,tier:1}},
-        {name:"inlet2",gname:"Advanced Inlet ($32K)",cost:32000,default:{type:"inlet",image:"inlet2",in:1200,capacity:0,sell:32000,tier:2}}
+        {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:4,capacity:0,sell:160,tier:1}},
+        {name:"outlet2",gname:"Advanced Outlet ($32K)",cost:32000,default:{type:"outlet",image:"outlet2",out:300,capacity:0,sell:32000,tier:2}},
+        {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:4,capacity:0,sell:160,tier:1}},
+        {name:"inlet2",gname:"Advanced Inlet ($32K)",cost:32000,default:{type:"inlet",image:"inlet2",in:300,capacity:0,sell:32000,tier:2}}
         ],[
         {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}},
         {name:"cap1",gname:"Advanced Capacitor ($160K)",cost:160000,default:{type:"capacitor",image:"cap2",power:14000,capacity:50,heat:0,sell:1000,tier:1}}
@@ -89,7 +95,7 @@ function resetValues(tier){
         uranium1:0,uranium2:1,uranium4:2,uranium8:3,
         plutonium1:4,plutonium2:5,plutonium4:6,plutonium8:7,
         thorium1:8,thorium2:9,thorium4:10,thorium8:11}
-        window.upgrades={potent:[0,0],perpetual:[0,0],generic:[0]}
+        window.upgrades={potent:[0,0],perpetual:[0,0],generic:[0,0,0]}
     }
     if(tier>2){ //restart game
         window.tooltips={
@@ -100,7 +106,7 @@ function resetValues(tier){
         inlet:function(inlet){return "Removes "+inlet.in+" heat from adjacent components."}
         }
         window.cellcosts=[10,6000]
-        window.genericcosts=[100]
+        window.genericcosts=[100,250,600] //powerlines,vents,ioutlets
     }
 }
 function drawGrid(){
@@ -220,11 +226,13 @@ function prevItem(){
 function nextType(){
     type+=1
     type%=types.length
+    item%=items[type].length
     updateType(type)
 }
 function prevType(){
     if(!type){type=types.length}
     type-=1
+    item%=items[type].length
     updateType(type)
 }
 function togglePerpetual(){
@@ -275,8 +283,9 @@ function income(){
                         addheat(i,j,cell.heat*Math.pow(cell.pulse+1,2),false)
                         break;
                     case "outlet":
-                        heat-=Math.min(cell.out,heat)
-                        addheat(i,j,Math.min(cell.out,heat),true)
+                        addheat(i,j,Math.min(cell.out*(upgrades.generic[2]+1),heat),true)
+                        console.log(Math.min(cell.out*(upgrades.generic[2]+1),heat))
+                        heat-=Math.min(cell.out*(upgrades.generic[2]+1),heat)
                     default:
                         break;
                 }
@@ -287,11 +296,11 @@ function income(){
                 cell=reactor[i][j]
                 switch(cell.type){
                     case "vent":
-                        cell.heat-=cell.vent
+                        cell.heat-=cell.vent*(upgrades.generic[1]+1)
                         if(cell.heat<0){cell.heat=0}
                         break;
                     case "inlet":
-                        heat+=removeheat(i,j,cell.in,true)
+                        heat+=removeheat(i,j,cell.in*(upgrades.generic[2]+1),true)
                     default:
                         break;
                 }
@@ -354,6 +363,7 @@ function income(){
     context.stroke()
     updatePower(buxpertick)
     window.autosell=maxpower/100*upgrades.generic[0]
+    checkObjectives()
 }
 function update(thing,value){
     document.getElementById(thing).innerHTML=value
@@ -460,7 +470,7 @@ function buyPotent(tier){
     }
 }
 function buyPerpetual(tier){
-    if(bux>cellcosts[tier]*100&&!upgrades.perpetual[tier]){
+    if(bux>cellcosts[tier]*100&&!upgrades.perpetual(tier)){
         updateBux(-(cellcosts[tier]*100))
         upgrades.perpetual[tier]++
         update("perpetual"+tier,"Purchased")
@@ -468,15 +478,11 @@ function buyPerpetual(tier){
     }
 }
 function buyGeneric(upgrade){
-    switch(upgrade){
-        case 0:
-            if(bux>Math.pow(100,upgrades.generic[upgrade])){
-                updateBux(-Math.pow(100,upgrades.generic[upgrade]))
-                upgrades.generic[upgrade]++
-                update("generic"+upgrade,"$"+100*Math.pow(10,upgrades.generic[upgrade]))
-                update("generic"+upgrade+"v",upgrades.generic[upgrade])
-            }
-            break;
+    if(bux>Math.pow(genericcosts[upgrade],upgrades.generic[upgrade])){
+        updateBux(-Math.pow(genericcosts[upgrade],upgrades.generic[upgrade]))
+        upgrades.generic[upgrade]++
+        update("generic"+upgrade,"$"+genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade]))
+        update("generic"+upgrade+"v",upgrades.generic[upgrade])
     }
 }
 function upgrade(x){
@@ -488,5 +494,39 @@ function upgrade(x){
             break;
     }
     return x
+}
+function checkObjectives(){
+    var complete=false
+    switch(objective){
+        case 0:
+            complete=checkFor("uranium1")
+            break;
+        case 1:
+            complete=power<3&&bux>10
+            break;
+        case 2:
+            complete=heat==0
+            break;
+        case 3:
+            complete=checkFor("vent1")
+            break;
+        default:
+            complete=false //maybe later :P
+            break;
+    }
+    if(complete){
+        updateBux(rewards[objective])
+        objective++
+        update("objective",objectives[objective])
+    }
+    return complete
+}
+function checkFor(image){
+    for(var i=0;i<reactor.length;i++){
+        for(var j=0;j<reactor.length;j++){
+            if(reactor[i][j].image==image){return true}
+        }
+    }
+    return false;
 }
 </script>
