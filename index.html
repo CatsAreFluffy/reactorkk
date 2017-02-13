@@ -2,7 +2,7 @@
 <span id="bux">Money: $10</span>
 <span id="power">Power: 0/100</span>
 <button onclick="sellpower()">Sell!</button>
-<span id="heat">Heat: 0/1000</span> <button onclick="heat-=1">-1 Heat</button><br>
+<span id="heat">Heat: 0/1000</span> <button onclick="updateHeat(-1)">-1 Heat</button><br>
 <button onclick="togglePause()" id="pause">Pause</button><button onclick="togglePerpetual()" id="perpetual">Disable perpetual cells</button><br>
 Objective: <span id="objective">Place a cell ($10)</span><br>
 <button onclick="prevType()">&lt;</button>
@@ -16,13 +16,13 @@ Objective: <span id="objective">Place a cell ($10)</span><br>
 You can't run the game :( ^ Update your browser to play ^
 </canvas>
 <ul>
-<li>Potent Uranium <span id="potent0v">0</span> <button id="potent0" onclick="buyPotent(0)">$500</button></li>
-<li>Perpetual Uranium <span id="perpetual0v">0</span> <button id="perpetual0" onclick="buyPerpetual(0)">$1000</button></li>
-<li>Potent Plutonium <span id="potent1v">0</span> <button id="potent1" onclick="buyPotent(1)">$300000</button></li>
-<li>Perpetual Plutonium <span id="perpetual1v">0</span> <button id="perpetual1" onclick="buyPerpetual(1)">$600000</button></li>
-<li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button></li>
-<li>Improved Vents <span id="generic1v">0</span> <button id="generic1" onclick="buyGeneric(1)">$250</button></li>
-<li>Improved Heat Transfer <span id="generic2v">0</span> <button id="generic2" onclick="buyGeneric(2)">$600</button></li>
+<li>Potent Uranium <span id="potent0v">0</span> <button id="potent0" onclick="buyPotent(0)">$500</button> Increase the power outplut of Uranium cells.</li>
+<li>Perpetual Uranium <span id="perpetual0v">0</span> <button id="perpetual0" onclick="buyPerpetual(0)">$1000</button> Make Uranium cells autoreplace.</li>
+<li>Potent Plutonium <span id="potent1v">0</span> <button id="potent1" onclick="buyPotent(1)">$300000</button> Increase the power outplut of Plutonium cells.</li>
+<li>Perpetual Plutonium <span id="perpetual1v">0</span> <button id="perpetual1" onclick="buyPerpetual(1)">$600000</button> Make Plutonium cells autoreplace.</li>
+<li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button> Autosell (level)/100 of your power capacity.</li>
+<li>Improved Vents <span id="generic1v">0</span> <button id="generic1" onclick="buyGeneric(1)">$250</button> Increase the venting of your vents.</li>
+<li>Improved Heat Transfer <span id="generic2v">0</span> <button id="generic2" onclick="buyGeneric(2)">$600</button> Increase the transfer rate of inlets and outlets.</li>
 </ul>
 <br>
 Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
@@ -48,8 +48,9 @@ function run(){
     window.run=true
     window.tick=setInterval(income,500)
     window.objective=0
-    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","All objectives completed! (for now...)"]
-    window.rewards=[10,10,10,50,10000000000]
+    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","All objectives completed! (for now...)"]
+    window.tracker={boughtitem:0,soldpower:0,zeroheat:0,ventplaced:0,upgraded:0}
+    window.rewards=[10,10,10,50,100,10000000000]
     canvas.onclick=click
     canvas.oncontextmenu=rclick
     drawGrid()
@@ -99,11 +100,11 @@ function resetValues(tier){
     }
     if(tier>2){ //restart game
         window.tooltips={
-        cell:function(cell){return "Generates "+cell.income+" power and "+cell.heat+" heat per tick for "+cell.power+" ticks."},
-        vent:function(vent){return "Vents "+vent.vent+" heat per tick. Holds "+vent.capacity+" heat."},
+        cell:function(cell){return "Generates "+cell.income*(upgrades.potent[cell.tier-1]+1)+" power and "+cell.heat+" heat per tick for "+cell.power+" ticks."},
+        vent:function(vent){return "Vents "+vent.vent*(upgrades.generic[1]+1)+" heat per tick. Holds "+vent.capacity+" heat."},
         capacitor:function(cap){return "Holds "+cap.power+" power and "+cap.capacity+" heat."},
-        outlet:function(out){return "Adds "+out.out+" heat to adjacent components."},
-        inlet:function(inlet){return "Removes "+inlet.in+" heat from adjacent components."}
+        outlet:function(out){return "Adds "+out.out*(upgrades.generic[2]+1)+" heat to adjacent components."},
+        inlet:function(inlet){return "Removes "+inlet.in*(upgrades.generic[2]+1)+" heat from adjacent components."}
         }
         window.cellcosts=[10,6000]
         window.genericcosts=[100,250,600] //powerlines,vents,ioutlets
@@ -162,6 +163,8 @@ function buy(event){
 function buyitem(object,x,y,gridx,gridy){
     if(bux>=object.cost){
         reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
+        tracker.boughtitem++
+        if(object.type=="vent"){tracker.boughtvent++}
         updateBux(-object.cost)
         updateAll()
     }
@@ -189,6 +192,7 @@ function replaceall(event){
             if(cell.image==image&&cell.type=="dcell"){
                 buyitem(items[0][itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
             }else if(cell.image==image){
+                sellitem(i,j)
                 buyitem(currentItem(),cell.drawx,cell.drawy,i,j)
             }
         }
@@ -212,6 +216,7 @@ function sell(event){
 function sellpower(){
     updateBux(power)
     updatePower(-power)
+    tracker.soldpower++
 }
 function nextItem(){
     item+=1
@@ -380,6 +385,7 @@ function updatePower(amount){
 function updateHeat(amount){
     heat+=amount
     clampheat()
+    if(heat<0.1&&tracker.soldpower){tracker.zeroheat++}
     update("heat","Heat: "+heat+"/1000")
 }
 function updateItem(item){
@@ -462,7 +468,7 @@ function clampheat(){
     heat=Math.round(heat*10)/10
 }
 function buyPotent(tier){
-    if(bux>cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])){
+    if(bux>=cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])){
         updateBux(-(cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])))
         upgrades.potent[tier]++
         update("potent"+tier,"$"+cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier]))
@@ -470,7 +476,7 @@ function buyPotent(tier){
     }
 }
 function buyPerpetual(tier){
-    if(bux>cellcosts[tier]*100&&!upgrades.perpetual(tier)){
+    if(bux>=cellcosts[tier]*100&&!upgrades.perpetual(tier)){
         updateBux(-(cellcosts[tier]*100))
         upgrades.perpetual[tier]++
         update("perpetual"+tier,"Purchased")
@@ -478,8 +484,8 @@ function buyPerpetual(tier){
     }
 }
 function buyGeneric(upgrade){
-    if(bux>Math.pow(genericcosts[upgrade],upgrades.generic[upgrade])){
-        updateBux(-Math.pow(genericcosts[upgrade],upgrades.generic[upgrade]))
+    if(bux>=genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade])){
+        updateBux(-genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade]))
         upgrades.generic[upgrade]++
         update("generic"+upgrade,"$"+genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade]))
         update("generic"+upgrade+"v",upgrades.generic[upgrade])
@@ -499,16 +505,19 @@ function checkObjectives(){
     var complete=false
     switch(objective){
         case 0:
-            complete=checkFor("uranium1")
+            complete=tracker.boughtitem
             break;
         case 1:
-            complete=power<3&&bux>10
+            complete=tracker.soldpower
             break;
         case 2:
-            complete=heat==0
+            complete=tracker.zeroheat
             break;
         case 3:
-            complete=checkFor("vent1")
+            complete=tracker.ventplaced
+            break;
+        case 4:
+            complete=tracker.upgraded
             break;
         default:
             complete=false //maybe later :P
