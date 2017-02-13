@@ -469,6 +469,7 @@ function clampheat(){
 }
 function buyPotent(tier){
     if(bux>=cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])){
+        tracker.upgraded++
         updateBux(-(cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])))
         upgrades.potent[tier]++
         update("potent"+tier,"$"+cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier]))
@@ -477,6 +478,7 @@ function buyPotent(tier){
 }
 function buyPerpetual(tier){
     if(bux>=cellcosts[tier]*100&&!upgrades.perpetual(tier)){
+        tracker.upgraded++
         updateBux(-(cellcosts[tier]*100))
         upgrades.perpetual[tier]++
         update("perpetual"+tier,"Purchased")
@@ -485,21 +487,12 @@ function buyPerpetual(tier){
 }
 function buyGeneric(upgrade){
     if(bux>=genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade])){
+        tracker.upgraded++
         updateBux(-genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade]))
         upgrades.generic[upgrade]++
         update("generic"+upgrade,"$"+genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade]))
         update("generic"+upgrade+"v",upgrades.generic[upgrade])
     }
-}
-function upgrade(x){
-    switch(x.type){
-        case "cell":
-            x.income*=(upgrades.potent[x.tier-1]+1)
-            break;
-        default:
-            break;
-    }
-    return x
 }
 function checkObjectives(){
     var complete=false
