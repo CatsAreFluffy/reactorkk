@@ -49,7 +49,7 @@ function run(){
     window.tick=setInterval(income,500)
     window.objective=0
     window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","All objectives completed! (for now...)"]
-    window.tracker={boughtitem:0,soldpower:0,zeroheat:0,ventplaced:0,upgraded:0}
+    window.tracker={boughtitem:0,soldpower:0,zeroheat:0,boughtvent:0,upgraded:0}
     window.rewards=[10,10,10,50,100,10000000000]
     canvas.onclick=click
     canvas.oncontextmenu=rclick
@@ -514,7 +514,7 @@ function checkObjectives(){
             complete=tracker.zeroheat
             break;
         case 3:
-            complete=tracker.ventplaced
+            complete=tracker.boughtvent
             break;
         case 4:
             complete=tracker.upgraded
