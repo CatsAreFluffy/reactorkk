@@ -3,10 +3,9 @@ A knockoff of a knockoff of a knockoff (jk) of a small component of a Minecraft 
 
 Made by me (CatsAreFluffy) and [Makeworld](https://scratch.mit.edu/users/MAKEWORLD/)
 
-Coming in 0.3.2:
-* New objective system!
-* Upgrade tooltips!
-* Part tooltips reflect upgrades!
+Coming in 0.4:
+* New part tiers
+* Dunno
 
 Coming sometime soon:
 * Heat exchangers!
