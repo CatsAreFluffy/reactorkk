@@ -18,15 +18,16 @@ You can't run the game :( ^ Update your browser to play ^
 <ul>
 <li>Potent Uranium <span id="potent0v">0</span> <button id="potent0" onclick="buyPotent(0)">$500</button> Increase the power outplut of Uranium cells.</li>
 <li>Perpetual Uranium <span id="perpetual0v">0</span> <button id="perpetual0" onclick="buyPerpetual(0)">$1000</button> Make Uranium cells autoreplace.</li>
-<li>Potent Plutonium <span id="potent1v">0</span> <button id="potent1" onclick="buyPotent(1)">$300000</button> Increase the power outplut of Plutonium cells.</li>
-<li>Perpetual Plutonium <span id="perpetual1v">0</span> <button id="perpetual1" onclick="buyPerpetual(1)">$600000</button> Make Plutonium cells autoreplace.</li>
+<li>Potent Plutonium <span id="potent1v">0</span> <button id="potent1" onclick="buyPotent(1)">$300K</button> Increase the power outplut of Plutonium cells.</li>
+<li>Perpetual Plutonium <span id="perpetual1v">0</span> <button id="perpetual1" onclick="buyPerpetual(1)">$600K</button> Make Plutonium cells autoreplace.</li>
 <li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button> Autosell (level)/100 of your power capacity.</li>
+<li>Improved Wiring <span id="generic3v">0</span> <button id="generic3" onclick="buyGeneric(3)">$1000</button> Increase capacitor's capacity</li>
 <li>Improved Vents <span id="generic1v">0</span> <button id="generic1" onclick="buyGeneric(1)">$250</button> Increase the venting of your vents.</li>
 <li>Improved Heat Transfer <span id="generic2v">0</span> <button id="generic2" onclick="buyGeneric(2)">$600</button> Increase the transfer rate of inlets and outlets.</li>
 </ul>
 <br>
 Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
-<button onclick="updateBux(1e303)">Cheat</button>
+<button onclick="updateBux(1.79e308)">Cheat (Please be careful)</button>
 <script>
 function run(){
     window.canvas=document.getElementById("game")
@@ -48,9 +49,9 @@ function run(){
     window.run=true
     window.tick=setInterval(income,500)
     window.objective=0
-    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","All objectives completed! (for now...)"]
+    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","All objectives completed! (for now...)"]
     window.tracker={boughtitem:0,soldpower:0,zeroheat:0,boughtvent:0,upgraded:0}
-    window.rewards=[10,10,10,50,100,10000000000]
+    window.rewards=[10,10,10,50,100,250,1.79e308]
     canvas.onclick=click
     canvas.oncontextmenu=rclick
     drawGrid()
@@ -61,6 +62,7 @@ function run(){
 function resetValues(tier){
     //every tick
     window.maxpower=100
+    window.maxheat=1000
     window.buxpertick=0
     if(tier>0){ //I forgot
         window.bux=10
@@ -74,40 +76,47 @@ function resetValues(tier){
         {name:"uranium2",gname:"Dual Uranium Cell ($25)",cost:25,default:{type:"cell",image:"uranium2",income:4,heat:8,power:15,capacity:0,pulses:2,pulse:0,sell:0,tier:1,name:"uranium2",replacecost:25}},
         {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,pulses:4,pulse:0,sell:0,tier:1,id:2,name:"uranium4",replacecost:60}},
         {name:"uranium8",gname:"Octo Uranium Cell ($140)",cost:140,default:{type:"cell",image:"uranium8",income:32,heat:128,power:15,capacity:0,pulses:8,pulse:0,sell:0,tier:1,id:3,name:"uranium8",replacecost:140}},
-        {name:"plutonium1",gname:"Plutonium Cell ($6K)",cost:6000,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,pulse:0,sell:0,tier:2,id:4,name:"plutonium1",replacecost:500}},
+        {name:"plutonium1",gname:"Plutonium Cell ($6000)",cost:6000,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,pulse:0,sell:0,tier:2,id:4,name:"plutonium1",replacecost:500}},
         {name:"plutonium2",gname:"Dual Plutonium Cell ($15K)",cost:15000,default:{type:"cell",image:"plutonium2",income:300,heat:600,power:60,capacity:0,pulses:2,pulse:0,sell:0,tier:2,id:5,name:"plutonium2",replacecost:1250}},
         {name:"plutonium4",gname:"Quad Plutonium Cell ($36K)",cost:36000,default:{type:"cell",image:"plutonium4",income:1200,heat:5400,power:60,capacity:0,pulses:4,pulse:0,sell:0,tier:2,id:6,name:"plutonium4",replacecost:3000}},
         {name:"plutonium8",gname:"Octo Plutonium Cell ($84K)",cost:84000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:8,pulse:0,sell:0,tier:2,id:7,name:"plutonium8",replacecost:7000}}
         ],[
         {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50,tier:1}},
-        {name:"vent2",gname:"Advanced Vent ($12.5K)",cost:12500,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:1000,tier:2}},
-        {name:"vent3",gname:"Super Vent ($3.125M)",cost:3125000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:20000,tier:3}},
+        {name:"vent2",gname:"Advanced Vent ($12.5K)",cost:12500,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:12500,tier:2}},
+        {name:"vent3",gname:"Super Vent ($3125K)",cost:3125000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:3125000,tier:3}},
+        {name:"vent4",gname:"Wondrous Vent ($781.25M)",cost:781250000,default:{type:"vent",image:"vent4",capacity:16875000,vent:16875000,heat:0,sell:781250000,tier:4}},
         ],[
         {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:4,capacity:0,sell:160,tier:1}},
         {name:"outlet2",gname:"Advanced Outlet ($32K)",cost:32000,default:{type:"outlet",image:"outlet2",out:300,capacity:0,sell:32000,tier:2}},
+        {name:"outlet2",gname:"Super Outlet ($6400K)",cost:6400000,default:{type:"outlet",image:"outlet3",out:22500,capacity:0,sell:640000,tier:3}},
         {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:4,capacity:0,sell:160,tier:1}},
-        {name:"inlet2",gname:"Advanced Inlet ($32K)",cost:32000,default:{type:"inlet",image:"inlet2",in:300,capacity:0,sell:32000,tier:2}}
+        {name:"inlet2",gname:"Advanced Inlet ($32K)",cost:32000,default:{type:"inlet",image:"inlet2",in:300,capacity:0,sell:32000,tier:2}},
+        {name:"outlet2",gname:"Super Inlet ($6400K)",cost:6400000,default:{type:"inlet",image:"inlet3",in:22500,capacity:0,sell:640000,tier:3}}
         ],[
-        {name:"cap1",gname:"Basic Capacitor ($1K)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}},
-        {name:"cap1",gname:"Advanced Capacitor ($160K)",cost:160000,default:{type:"capacitor",image:"cap2",power:14000,capacity:50,heat:0,sell:1000,tier:1}}
+        {name:"cap1",gname:"Basic Capacitor ($1000)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}},
+        {name:"cap2",gname:"Advanced Capacitor ($160K)",cost:160000,default:{type:"capacitor",image:"cap2",power:14000,capacity:50,heat:0,sell:160000,tier:2}},
+        {name:"cap2",gname:"Super Capacitor ($25.6M)",cost:25600000,default:{type:"capacitor",image:"cap3",power:1960000,capacity:250,heat:0,sell:25600000,tier:3}}
+        ],[
+        {name:"plating1",gname:"Basic Plating ($1000)",cost:1000,default:{type:"plating",image:"plating1",heat:100,sell:1000,tier:1}},
         ]]
-        window.types=["Cells","Vents","In/Outlets","Capacitors"]
+        window.types=["Cells","Vents","In/Outlets","Capacitors","Plating"]
         window.itemstable={
         uranium1:0,uranium2:1,uranium4:2,uranium8:3,
         plutonium1:4,plutonium2:5,plutonium4:6,plutonium8:7,
         thorium1:8,thorium2:9,thorium4:10,thorium8:11}
-        window.upgrades={potent:[0,0],perpetual:[0,0],generic:[0,0,0]}
+        window.upgrades={potent:[0,0],perpetual:[0,0],generic:[0,0,0,0]}
     }
     if(tier>2){ //restart game
         window.tooltips={
         cell:function(cell){return "Generates "+cell.income*(upgrades.potent[cell.tier-1]+1)+" power and "+cell.heat+" heat per tick for "+cell.power+" ticks."},
         vent:function(vent){return "Vents "+vent.vent*(upgrades.generic[1]+1)+" heat per tick. Holds "+vent.capacity+" heat."},
-        capacitor:function(cap){return "Holds "+cap.power+" power and "+cap.capacity+" heat."},
+        capacitor:function(cap){return "Holds "+cap.power*(upgrades.generic[3]+1)+" power and "+cap.capacity+" heat."},
         outlet:function(out){return "Adds "+out.out*(upgrades.generic[2]+1)+" heat to adjacent components."},
-        inlet:function(inlet){return "Removes "+inlet.in*(upgrades.generic[2]+1)+" heat from adjacent components."}
+        inlet:function(inlet){return "Removes "+inlet.in*(upgrades.generic[2]+1)+" heat from adjacent components."},
+        plating:function(plate){return "Adds "+plate.heat+" heat capacity to your reactor."}
         }
         window.cellcosts=[10,6000]
-        window.genericcosts=[100,250,600] //powerlines,vents,ioutlets
+        window.genericcosts=[100,250,600,1000] //powerlines,vents,ioutlets,wiring
     }
 }
 function drawGrid(){
@@ -122,10 +131,25 @@ function drawGrid(){
     }
 }
 function loadImages(){
-    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","vent1","vent2","vent3","outlet1","outlet2","inlet1","inlet2","cap1","cap2","boom"]
+    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","vent1","vent2","vent3","vent4","outlet1","outlet2","outlet3","inlet1","inlet2","inlet3","cap1","cap2","cap3","plating1","plating2","boom"]
     for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
+    }
+}
+function buyitem(object,x,y,gridx,gridy){
+    if(bux>=object.cost){
+        reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
+        tracker.boughtitem++
+        if(object.default.type=="vent"){tracker.boughtvent++}
+        updateBux(-object.cost)
+        updateAll()
+    }
+}
+function sellitem(x,y){
+    if(reactor[x][y].type!="empty"){
+        updateBux(reactor[x][y].sell)
+        reactor[x][y]={type:"empty",explosion:0}
     }
 }
 function click(event){
@@ -136,7 +160,11 @@ function click(event){
     }
 } 
 function rclick(event){
-    sell(event)
+    if(event.shiftKey){
+        sellall(event)
+    }else{
+        sell(event)
+    }
     return false
 }
 function buy(event){
@@ -158,21 +186,6 @@ function buy(event){
         case "dcell":
             buyitem(items[0][itemstable[cell.name]],x,y,gridx,gridy)
         break;
-    }
-}
-function buyitem(object,x,y,gridx,gridy){
-    if(bux>=object.cost){
-        reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
-        tracker.boughtitem++
-        if(object.default.type=="vent"){tracker.boughtvent++}
-        updateBux(-object.cost)
-        updateAll()
-    }
-}
-function sellitem(x,y){
-    if(reactor[x][y].type!="empty"){
-        updateBux(reactor[x][y].sell)
-        reactor[x][y]={type:"empty",explosion:0}
     }
 }
 function replaceall(event){
@@ -213,7 +226,24 @@ function sell(event){
         sellitem(gridx,gridy)
     }
 }
-function sellpower(){
+
+function sellall(event){
+    var x=event.pageX-canvasleft
+    var y=event.pageY-canvastop
+    var ioffset=18
+    var ooffset=3
+    var scale=30
+    x=(x-ioffset)/scale;y=(y-ioffset)/scale
+    x=Math.round(x);y=Math.round(y)
+    gridx=x;gridy=y
+    x=x*scale+ooffset;y=y*scale+ooffset
+    var image=reactor[gridx][gridy].image
+    for(var i=0;i<reactor.length;i++){
+        for(var j=0;j<reactor[i].length;j++){
+            sellitem(i,j)
+        }
+    }
+}function sellpower(){
     updateBux(power)
     updatePower(-power)
     tracker.soldpower++
@@ -266,7 +296,6 @@ function unpause(){
 function income(){
     buxpertick=0
     context.clearRect(0, 0, canvas.width, canvas.height)
-    buxpertick=0
     if(run){
         for(var i=0;i<reactor.length;i++){ //pulses tick
             for(var j=0;j<reactor[i].length;j++){
@@ -350,9 +379,10 @@ function income(){
         }
         updateBux(Math.min(autosell,power))
         updatePower(-Math.min(autosell,power))
-        updateHeat(Math.min((1000-heat)/50,-0.1))
+        updateHeat(Math.min((maxheat-heat)/50,-0.1))
     }
     maxpower=100
+    maxheat=1000
     for(var i=0;i<reactor.length;i++){ //render/capacity tick
         for(var j=0;j<reactor[i].length;j++){
             cell=reactor[i][j]
@@ -360,7 +390,10 @@ function income(){
                 context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
             }
             if(cell.type=="capacitor"){
-                maxpower+=cell.power
+                maxpower+=cell.power*(upgrades.generic[3]+1)
+            }
+            if(cell.type=="plating"){
+                maxheat+=cell.heat
             }
         }
     }
@@ -375,7 +408,7 @@ function update(thing,value){
 }
 function updateBux(amount){
     bux+=amount
-    update("bux","Money: $"+bux)
+    update("bux","Money: $"+format(bux))
 }
 function updatePower(amount){
     power+=amount
@@ -386,7 +419,7 @@ function updateHeat(amount){
     heat+=amount
     clampheat()
     if(heat<0.1&&tracker.soldpower){tracker.zeroheat++}
-    update("heat","Heat: "+heat+"/1000")
+    update("heat","Heat: "+heat+"/"+maxheat)
 }
 function updateItem(item){
     update("item",currentItem().gname)
@@ -472,7 +505,7 @@ function buyPotent(tier){
         tracker.upgraded++
         updateBux(-(cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])))
         upgrades.potent[tier]++
-        update("potent"+tier,"$"+cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier]))
+        update("potent"+tier,"$"+format(cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])))
         update("potent"+tier+"v",upgrades.potent[tier])
     }
 }
@@ -490,7 +523,7 @@ function buyGeneric(upgrade){
         tracker.upgraded++
         updateBux(-genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade]))
         upgrades.generic[upgrade]++
-        update("generic"+upgrade,"$"+genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade]))
+        update("generic"+upgrade,"$"+format(genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade])))
         update("generic"+upgrade+"v",upgrades.generic[upgrade])
     }
 }
@@ -512,8 +545,12 @@ function checkObjectives(){
         case 4:
             complete=tracker.upgraded
             break;
+        case 5:
+            console.log(buxpertick)
+            complete=buxpertick>50
+            break;
         default:
-            complete=false //maybe later :P
+            complete=false //maybe later :D
             break;
     }
     if(complete){
@@ -530,5 +567,29 @@ function checkFor(image){
         }
     }
     return false;
+}
+function format(n){
+    var norder=Math.max(Math.floor((Math.log10(n)-1)/3),0)
+    if(norder){
+        return (n/Math.pow(1000,norder)).toPrecision(4)+modifier(norder)
+    }else{
+        return n
+    }
+}
+function modifier(n){
+    var modifiers=["K","M","B","T","Qa","Qi","Sx","Sp","Oc","No"]
+    var xmodifiers=["Dc","Vg","Tg","Qg","Pg","Sg","Hg","Og","Ng","Ct"] //this is enough, trust me
+    var smodifiers=["","U","D","T","Q","P","S","H","O","N"]
+    if(n<=10){
+        return modifiers[n-1]
+    }else{
+        n--
+        return smodifiers[n%10]+xmodifiers[Math.floor(n/10)-1]
+    }
+}
+function formattest(){
+    for(i=0;i<308;i+=3){
+        console.log(format(Math.pow(10,i)))
+    }
 }
 </script>
