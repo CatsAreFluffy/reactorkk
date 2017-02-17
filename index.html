@@ -88,16 +88,17 @@ function resetValues(tier){
         ],[
         {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:4,capacity:0,sell:160,tier:1}},
         {name:"outlet2",gname:"Advanced Outlet ($32K)",cost:32000,default:{type:"outlet",image:"outlet2",out:300,capacity:0,sell:32000,tier:2}},
-        {name:"outlet2",gname:"Super Outlet ($6400K)",cost:6400000,default:{type:"outlet",image:"outlet3",out:22500,capacity:0,sell:640000,tier:3}},
+        {name:"outlet2",gname:"Super Outlet ($6400K)",cost:6400000,default:{type:"outlet",image:"outlet3",out:22500,capacity:0,sell:6400000,tier:3}},
         {name:"inlet1",gname:"Basic Inlet ($160)",cost:160,default:{type:"inlet",image:"inlet1",in:4,capacity:0,sell:160,tier:1}},
         {name:"inlet2",gname:"Advanced Inlet ($32K)",cost:32000,default:{type:"inlet",image:"inlet2",in:300,capacity:0,sell:32000,tier:2}},
-        {name:"outlet2",gname:"Super Inlet ($6400K)",cost:6400000,default:{type:"inlet",image:"inlet3",in:22500,capacity:0,sell:640000,tier:3}}
+        {name:"outlet2",gname:"Super Inlet ($6400K)",cost:6400000,default:{type:"inlet",image:"inlet3",in:22500,capacity:0,sell:6400000,tier:3}}
         ],[
         {name:"cap1",gname:"Basic Capacitor ($1000)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}},
         {name:"cap2",gname:"Advanced Capacitor ($160K)",cost:160000,default:{type:"capacitor",image:"cap2",power:14000,capacity:50,heat:0,sell:160000,tier:2}},
         {name:"cap2",gname:"Super Capacitor ($25.6M)",cost:25600000,default:{type:"capacitor",image:"cap3",power:1960000,capacity:250,heat:0,sell:25600000,tier:3}}
         ],[
         {name:"plating1",gname:"Basic Plating ($1000)",cost:1000,default:{type:"plating",image:"plating1",heat:100,sell:1000,tier:1}},
+        {name:"plating2",gname:"Advanced Plating ($160K)",cost:160000,default:{type:"plating",image:"plating2",heat:14000,sell:160000,tier:1}}
         ]]
         window.types=["Cells","Vents","In/Outlets","Capacitors","Plating"]
         window.itemstable={
@@ -238,12 +239,16 @@ function sellall(event){
     gridx=x;gridy=y
     x=x*scale+ooffset;y=y*scale+ooffset
     var image=reactor[gridx][gridy].image
+    console.log(image)
     for(var i=0;i<reactor.length;i++){
         for(var j=0;j<reactor[i].length;j++){
-            sellitem(i,j)
+            if(reactor[i][j].image==image){
+                sellitem(i,j)
+            }
         }
     }
-}function sellpower(){
+}
+function sellpower(){
     updateBux(power)
     updatePower(-power)
     tracker.soldpower++
