@@ -8,11 +8,25 @@ Made by me (CatsAreFluffy) and [Makeworld](https://scratch.mit.edu/users/MAKEWOR
 Coming in 0.4:
 * More T3 parts
 * New objective (as usual)
-* Number formatting (what's the difference betwee 300000000 and 3000000000?)
+* Number formatting (what's the difference between 300000000 and 3000000000?)
 * Plating
 
 Coming in 0.4.1:
 * Thorium
+* Horizontal arrangement of panels (reactor, upgrades, options)
+* Options (always replace depleted cells with shiftclick, shiftclick between types...)
+* Format tooltips
+* More stuff (maybe)
+* New objective (as usual)
+* Click modifier buttons (mobile compatibility)
+* More stuff
+
+Coming in 0.5:
+* Saving
+* Wondrous components
+* Stuff to cnsider later
+* New objective (probably)
+* More stuff
 
 Coming sometime soon:
 * Heat exchangers
