@@ -84,7 +84,7 @@ function resetValues(tier){
         {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50,tier:1}},
         {name:"vent2",gname:"Advanced Vent ($12.5K)",cost:12500,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:12500,tier:2}},
         {name:"vent3",gname:"Super Vent ($3125K)",cost:3125000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:3125000,tier:3}},
-        {name:"vent4",gname:"Wondrous Vent ($781.25M)",cost:781250000,default:{type:"vent",image:"vent4",capacity:16875000,vent:16875000,heat:0,sell:781250000,tier:4}},
+        {name:"vent4",gname:"Wondrous Vent ($781.25M)",cost:781250000,default:{type:"vent",image:"vent4",capacity:16875000,vent:1687500,heat:0,sell:781250000,tier:4}},
         ],[
         {name:"outlet1",gname:"Basic Outlet ($160)",cost:160,default:{type:"outlet",image:"outlet1",out:4,capacity:0,sell:160,tier:1}},
         {name:"outlet2",gname:"Advanced Outlet ($32K)",cost:32000,default:{type:"outlet",image:"outlet2",out:300,capacity:0,sell:32000,tier:2}},
@@ -320,6 +320,7 @@ function income(){
                 switch(cell.type){
                     case "cell":
                         addheat(i,j,cell.heat*Math.pow(cell.pulse+1,2),false)
+                        console.log(cell.pulse)
                         break;
                     case "outlet":
                         addheat(i,j,Math.min(cell.out*(upgrades.generic[2]+1),heat),true)
@@ -474,7 +475,7 @@ function addpulse(x,y,heat){
     }
     if(heatcells.length){
         for(var i=0;i<heatcells.length;i++){
-            heatcells[i].pulse++
+            heatcells[i].pulse+=heat
         }
     }else{
         //...nothing? k
