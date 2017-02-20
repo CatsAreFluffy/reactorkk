@@ -446,13 +446,13 @@ function updateBux(amount){
 function updatePower(amount){
     power+=amount
     if(power>maxpower){power=maxpower}
-    update("power","Power: "+power+"/"+maxpower)
+    update("power","Power: "+format(power)+"/"+format(maxpower))
 }
 function updateHeat(amount){
     heat+=amount
     clampheat()
     if(heat<0.1&&tracker.soldpower){tracker.zeroheat++}
-    update("heat","Heat: "+heat+"/"+maxheat)
+    update("heat","Heat: "+format(heat)+"/"+format(maxheat))
 }
 function updateItem(item){
     update("item",currentItem().gname)
