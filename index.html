@@ -1,4 +1,4 @@
-<html><head>0.4.1 beta 3<br></head><body onload="run()">
+<html><head></head><body onload="run()">
 <span id="bux">Money: $10</span>
 <span id="power">Power: 0/100</span>
 <button onclick="sellpower()">Sell!</button>
@@ -37,7 +37,8 @@ Click to:
 </ul>
 <br>
 Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
-<button onclick="updateBux(1.79e308)">Cheat (Please be careful)</button>
+<button onclick="updateBux(1.79e308)">Cheat (Please be careful)</button><br>
+0.4.1 beta 4
 <script>
 function run(){
     window.canvas=document.getElementById("game")
@@ -134,7 +135,7 @@ function resetValues(tier){
         inlet:function(inlet){return "Removes "+format(inlet.in*(upgrades.generic[2]+1))+" heat from adjacent components."},
         plating:function(plate){return "Adds "+format(plate.heat)+" heat capacity to your reactor."}
         }
-        window.cellcosts=[10,6000]
+        window.cellcosts=[10,6000,3600000]
         window.genericcosts=[100,250,600,1000] //powerlines,vents,ioutlets,wiring
     }
 }
@@ -263,7 +264,6 @@ function sellall(event){
     gridx=x;gridy=y
     x=x*scale+ooffset;y=y*scale+ooffset
     var image=reactor[gridx][gridy].image
-    console.log(image)
     for(var i=0;i<reactor.length;i++){
         for(var j=0;j<reactor[i].length;j++){
             if(reactor[i][j].image==image){
@@ -274,7 +274,6 @@ function sellall(event){
 }
 function clickmode(button){
     for(i=0;i<4;i++){
-        console.log(i)
         document.getElementById("mode"+i).disabled=false
     }
     document.getElementById("mode"+button).disabled=true
@@ -353,11 +352,9 @@ function income(){
                 switch(cell.type){
                     case "cell":
                         addheat(i,j,cell.heat*Math.pow(cell.pulse+1,2),false)
-                        console.log(cell.pulse)
                         break;
                     case "outlet":
                         addheat(i,j,Math.min(cell.out*(upgrades.generic[2]+1),heat),true)
-                        console.log(Math.min(cell.out*(upgrades.generic[2]+1),heat))
                         heat-=Math.min(cell.out*(upgrades.generic[2]+1),heat)
                     default:
                         break;
