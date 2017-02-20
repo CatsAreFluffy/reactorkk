@@ -1,4 +1,4 @@
-<html><head></head><body onload="run()">
+<html><head>0.4.1 beta 3<br></head><body onload="run()">
 <span id="bux">Money: $10</span>
 <span id="power">Power: 0/100</span>
 <button onclick="sellpower()">Sell!</button>
@@ -18,10 +18,10 @@ You can't run the game :( ^ Update your browser to play ^
 </canvas><br>
 Click to:
 <ul>
-<li><button id="mode0" onclick="mode=buy;clickmode(0)" disabled=true>Buy</button></li>
+<li><button id="mode0" onclick="mode=buy;clickmode(0)" disabled=true>Buy item</button></li>
 <li><button id="mode1" onclick="mode=replaceall;clickmode(1)">Replace all of type</button></li>
 <li><button id="mode2" onclick="mode=sell;clickmode(2)">Sell item</button></li>
-<li><button id="mode3" onclick="mode=sellall;clickmode(3)">sell all of type</button></li>
+<li><button id="mode3" onclick="mode=sellall;clickmode(3)">Sell all of type</button></li>
 </ul>
 <ul>
 <li>Potent Uranium <span id="potent0v">0</span> <button id="potent0" onclick="buyPotent(0)">$500</button> Increase the power output of Uranium cells.</li>
@@ -204,7 +204,13 @@ function buy(event){
             break;
         case "dcell":
             buyitem(items[0][itemstable[cell.name]],x,y,gridx,gridy)
-        break;
+            break;
+        default:
+            if(object.default.type==cell.type){
+                sellitem(x,y)
+                buyitem(object,x,y,gridx,gridy)
+            }
+            break;
     }
 }
 function replaceall(event){
@@ -223,7 +229,7 @@ function replaceall(event){
             var cell=reactor[i][j]
             if(cell.image==image&&cell.type=="dcell"){
                 buyitem(items[0][itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
-            }else if(cell.image==image){
+            }else if(cell.image==image&&cell.type!="empty"){
                 sellitem(i,j)
                 buyitem(currentItem(),cell.drawx,cell.drawy,i,j)
             }
