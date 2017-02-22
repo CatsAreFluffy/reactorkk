@@ -36,6 +36,9 @@ Click to:
 <li>Perpetual Plutonium <span id="perpetual1v">0</span> <button id="perpetual1" onclick="buyPerpetual(1)">$600K</button> Make Plutonium cells autoreplace.</li>
 <li>Potent Thorium <span id="potent2v">0</span> <button id="potent2" onclick="buyPotent(2)">$180M</button> Increase the power output of Thorium cells.</li>
 <li>Perpetual Thorium <span id="perpetual2v">0</span> <button id="perpetual2" onclick="buyPerpetual(2)">$360M</button> Make Thorium cells autoreplace.</li>
+<li>Potent Seaborgium <span id="potent3v">0</span> <button id="potent3" onclick="buyPotent(3)">$108B</button> Increase the power output of Seaborgium cells.</li>
+<li>Perpetual Seaborgium <span id="perpetual3v">0</span> <button id="perpetual3" onclick="buyPerpetual(3)">$216B</button> Make Seaborgium cells autoreplace.</li>
+
 <li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button> Autosell (level)/100 of your power capacity.</li>
 <li>Improved Wiring <span id="generic3v">0</span> <button id="generic3" onclick="buyGeneric(3)">$1000</button> Increase capacitor's capacity</li>
 <li>Improved Vents <span id="generic1v">0</span> <button id="generic1" onclick="buyGeneric(1)">$250</button> Increase the venting of your vents.</li>
@@ -51,9 +54,9 @@ Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, th
 <li> Always replace depleted cells <button id="options0" onclick="setOption(0)">Yes</button></li>
 <li> Shiftclick between types <button id="options1" onclick="setOption(1)">No</button></li>
 </ul>
-<button id="save" onclick="save()">Save</button><button id="load" onclick="troll()">Load?</button><br>
+<button id="save" onclick="save()">Save</button><button id="load" onclick="load()">Load</button><br>
 <textarea id="savefile" style="width: 250; height: 100;">Paste your save code here</textarea><br>
-0.5 beta 1
+Reactor Knockoff Knockoff 0.5 beta 2
 </span>
 <script>
 function run(){
@@ -78,7 +81,7 @@ function run(){
     window.objective=0
     window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","Buy a Perpetual upgrade ($500)","Generate 200 power per tick ($1000)","Place a Plutonium cell ($2500)","All objectives completed! (for now...)"]
     window.tracker={boughtitem:0,soldpower:0,zeroheat:0,boughtvent:0,upgraded:0,perpetual:0,maxcelltier:0}
-    window.rewards=[10,10,10,50,100,250,500,1000,1.79e308]
+    window.rewards=[10,10,10,50,100,250,500,1000,2500,1.79e308]
     window.selector=[0,0,0,0,0,0]
     window.exactplz=false
     window.mode=buy
@@ -145,8 +148,10 @@ function resetValues(tier){
         {name:"plating3",gname:"Super Plating ($25.6M)",cost:25600000,default:{type:"plating",image:"plating3",heat:1960000,sell:160000,tier:3}},
         {name:"plating4",gname:"Wondrous Plating ($4096M)",cost:4096000000,default:{type:"plating",image:"plating4",heat:2744000000,sell:4096000000,tier:4}}
         ],[
-        {name:"cool1",gname:"Basic Coolant Cell ($500)",cost:5000,default:{type:"coolant",image:"cool1",capacity:2000,heat:0,sell:2000,tier:1}},
-        {name:"cool2",gname:"Advanced Coolant Cell ($100K)",cost:100000,default:{type:"coolant",image:"cool2",capacity:100000,heat:0,sell:2000,tier:2}} //note to self: do Super and Wondrous...maybe later :P
+        {name:"cool1",gname:"Basic Coolant Cell ($500)",cost:5000,default:{type:"coolant",image:"cool1",capacity:2000,heat:0,sell:500,tier:1}},
+        {name:"cool2",gname:"Advanced Coolant Cell ($100K)",cost:100000,default:{type:"coolant",image:"cool2",capacity:100000,heat:0,sell:100000,tier:2}},
+        {name:"cool3",gname:"Super Coolant Cell ($20M)",cost:20000000,default:{type:"coolant",image:"cool3",capacity:5000000,heat:0,sell:20000000,tier:3}},
+        {name:"cool4",gname:"Wondrous Coolant Cell ($4000M)",cost:4000000000,default:{type:"coolant",image:"cool4",capacity:250000000,heat:0,sell:4000000000,tier:4}}
         ]]
         window.upgrades={potent:[0,0,0,0],perpetual:[0,0,0,0],generic:[0,0,0,0]}
     }
@@ -157,7 +162,8 @@ function resetValues(tier){
         capacitor:function(cap){return "Holds "+format(cap.power*(upgrades.generic[3]+1))+" power and "+format(cap.capacity)+" heat."},
         outlet:function(out){return "Adds "+format(out.out*(upgrades.generic[2]+1))+" heat to adjacent components."},
         inlet:function(inlet){return "Removes "+format(inlet.in*(upgrades.generic[2]+1))+" heat from adjacent components."},
-        plating:function(plate){return "Adds "+format(plate.heat)+" heat capacity to your reactor."}
+        plating:function(plate){return "Adds "+format(plate.heat)+" heat capacity to your reactor."},
+        coolant:function(cool){return "Stores "+format(cool.capacity)+" heat."}
         }
         window.types=["Cells","Vents","In/Outlets","Capacitors","Plating","Coolant Cells"]
         window.itemstable={
@@ -165,7 +171,7 @@ function resetValues(tier){
         plutonium1:4,plutonium2:5,plutonium4:6,plutonium8:7,
         thorium1:8,thorium2:9,thorium4:10,thorium8:11,
         seaborgium1:12,seaborgium2:13,seaborgium4:14,seaborgium8:15} //why does this exist..?
-        window.cellcosts=[10,6000,3600000]
+        window.cellcosts=[10,6000,3600000,2160000000]
         window.genericcosts=[100,250,600,1000] //powerlines,vents,ioutlets,wiring
     }
 }
@@ -314,10 +320,6 @@ function sellpower(){
     updatePower(-power)
     tracker.soldpower++
 }
-function troll(){
-    updateBux(JSON.parse(savefile()).bux)
-    setsavefile("AS IF I'd ever load your savefile! XD (: ...Fine. Here's your money.")
-}
 function nextItem(){
     item+=1
     item%=items[type].length
@@ -430,22 +432,13 @@ function income(){
                             }
                         }
                         break;
-                    case "vent":
-                        context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
-                        if(cell.heat>cell.capacity){
-                            reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
-                        }
-                        break;
-                    case "capacitor":
-                        context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
-                        if(cell.heat>cell.capacity){
-                            reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
-                        }
-                        break;
                     default:
                         context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
+                        if(cell.capacity&&cell.heat>cell.capacity){
+                            reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
+                        }
                 }
-                if(heat>2000&&cell.type!="empty"){reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
+                if(heat>maxheat*2&&cell.type!="empty"){reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
             }
         }
         updateBux(Math.min(autosell,power))
@@ -506,6 +499,24 @@ function updateAll(){
     updateBux(0)
     updateItem(item)
     updateType(type)
+}
+function updateTrulyAll(){
+    updateAll()
+    for(var i=0;i<upgrades.potent.length;i++){
+        update("potent"+i,"$"+format(cellcosts[i]*50*Math.pow(10,upgrades.potent[i])))
+        update("potent"+i+"v",upgrades.potent[i])
+    }
+    for(var i=0;i<upgrades.perpetual.length;i++){
+        update("perpetual"+i,"$"+format(upgrades.perpetual[i]?"Purchased":cellcosts[i]*100))
+        update("perpetual"+i+"v",upgrades.perpetual[i])
+    }
+    for(var i=0;i<upgrades.generic.length;i++){
+        update("generic"+i,"$"+format(genericcosts[i]*Math.pow(10,upgrades.generic[i])))
+        update("generic"+i+"v",upgrades.generic[i])
+    }
+    for(var i=0;i<options.length;i++){
+        update("options"+i,options[i]?"Yes":"No")
+    }
 }
 function currentItem(){
     return items[type][item]
@@ -681,31 +692,32 @@ function setsavefile(x){
     document.getElementById("savefile").value=x
 }
 function save(){
-    var saveobject={version:[0,5,0,1],bux:bux,power:power,heat:heat,maxpower:maxpower,maxheat:maxheat,options:options,upgrades:upgrades,reactor:reactor}
+    var saveobject={version:[0,5,0,2],bux:bux,power:power,heat:heat,maxpower:maxpower,maxheat:maxheat,options:options,upgrades:upgrades,reactor:reactor}
     setsavefile(JSON.stringify(saveobject))
     return JSON.stringify(saveobject)
 }
 function load(){
-    //maybe later
+    var saveobject=JSON.parse(savefile())
+    var load=["bux","power","heat","maxpower","maxheat","options","upgrades","reactor"]
+    if(lorder(saveobject.version,[0,5,0,2])){
+        setsavefile("Future version detected. Please use latest version of game.")
+    }else{
+        resetValues(3)
+        for(var i=0;i<load.length;i++){
+            window[load[i]]=saveobject[load[i]]
+        }
+        pause()
+        updateTrulyAll()
+    }
+}
+function lorder(lt,gt){
+    for(var i=0;i<lt.length;i++){
+        if(lt[i]>gt[i]){return true}
+        if(lt[i]<gt[i]){return false}
+    }
 }
 function setOption(x){
     options[x]=!options[x]
     update("options"+x,options[x]?"Yes":"No")
 }
-
-/*
-function save(){ //this will suck D:
-    var save=""
-    save+="0.5;bux="+bux+";power="+power+";heat="+heat+";upotent="+str(upgrades.potent)+";uperpetual="+str(upgrades.perpetual)+";ugeneric="+str(upgrades.generic)+";reactor="+savereactor()
-}
-function str(array){ //X(
-    var save=""
-    for(i=0;i<array.length;i++){
-        save+=array[i]+","
-    }
-    return save
-}
-function savereactor( //oh no D:
-    var save
-*/ //just a for the record thing, will be deleted in beta 2
 </script>
