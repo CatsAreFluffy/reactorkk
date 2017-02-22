@@ -56,7 +56,7 @@ Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, th
 </ul>
 <button id="save" onclick="save()">Save</button><button id="load" onclick="load()">Load</button><br>
 <textarea id="savefile" style="width: 250; height: 100;">Paste your save code here</textarea><br>
-Reactor Knockoff Knockoff 0.5 beta 2
+Reactor Knockoff Knockoff 0.5 beta 3
 </span>
 <script>
 function run(){
@@ -111,7 +111,7 @@ function resetValues(tier){
         {name:"uranium4",gname:"Quad Uranium Cell ($60)",cost:60,default:{type:"cell",image:"uranium4",income:12,heat:36,power:15,capacity:0,pulses:4,pulse:0,sell:0,tier:1,id:2,name:"uranium4",replacecost:60}},
         {name:"uranium8",gname:"Octo Uranium Cell ($140)",cost:140,default:{type:"cell",image:"uranium8",income:32,heat:128,power:15,capacity:0,pulses:8,pulse:0,sell:0,tier:1,id:3,name:"uranium8",replacecost:140}},
         {name:"plutonium1",gname:"Plutonium Cell ($6000)",cost:6000,default:{type:"cell",image:"plutonium1",income:150,heat:150,power:60,capacity:0,pulses:1,pulse:0,sell:0,tier:2,id:4,name:"plutonium1",replacecost:6000}},
-        {name:"plutonium2",gname:"Dual Plutonium Cell ($15K)",cost:15000,default:{type:"cell",image:"plutonium2",income:300,heat:600,power:60,capacity:0,pulses:2,pulse:0,sell:0,tier:2,id:5,name:"plutonium2",replacecost:15000}},
+        {name:"plutonium2",gname:"Dual Plutonium Cell ($15K)",cost:15000,default:{type:"cell",image:"plutonium2",income:600,heat:1200,power:60,capacity:0,pulses:2,pulse:0,sell:0,tier:2,id:5,name:"plutonium2",replacecost:15000}},
         {name:"plutonium4",gname:"Quad Plutonium Cell ($36K)",cost:36000,default:{type:"cell",image:"plutonium4",income:1200,heat:5400,power:60,capacity:0,pulses:4,pulse:0,sell:0,tier:2,id:6,name:"plutonium4",replacecost:36000}},
         {name:"plutonium8",gname:"Octo Plutonium Cell ($84K)",cost:84000,default:{type:"cell",image:"plutonium8",income:4800,heat:19200,power:60,capacity:0,pulses:8,pulse:0,sell:0,tier:2,id:7,name:"plutonium8",replacecost:84000}},
         {name:"thorium1",gname:"Thorium Cell ($3600K)",cost:3600000,default:{type:"cell",image:"thorium1",income:22500,heat:22500,power:240,capacity:0,pulses:1,pulse:0,sell:0,tier:3,id:8,name:"thorium1",replacecost:3600000}},
@@ -517,6 +517,7 @@ function updateTrulyAll(){
     for(var i=0;i<options.length;i++){
         update("options"+i,options[i]?"Yes":"No")
     }
+    update("objective",objectives[objective])
 }
 function currentItem(){
     return items[type][item]
@@ -692,19 +693,19 @@ function setsavefile(x){
     document.getElementById("savefile").value=x
 }
 function save(){
-    var saveobject={version:[0,5,0,2],bux:bux,power:power,heat:heat,maxpower:maxpower,maxheat:maxheat,options:options,upgrades:upgrades,reactor:reactor}
+    var saveobject={version:[0,5,0,3],bux:bux,power:power,heat:heat,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
     setsavefile(JSON.stringify(saveobject))
     return JSON.stringify(saveobject)
 }
 function load(){
     var saveobject=JSON.parse(savefile())
-    var load=["bux","power","heat","maxpower","maxheat","options","upgrades","reactor"]
-    if(lorder(saveobject.version,[0,5,0,2])){
+    var load=["bux","power","heat","maxpower","maxheat","objective","options","upgrades","tracker","reactor"]
+    if(lorder(saveobject.version,[0,5,0,3])){
         setsavefile("Future version detected. Please use latest version of game.")
     }else{
         resetValues(3)
         for(var i=0;i<load.length;i++){
-            window[load[i]]=saveobject[load[i]]
+            if(load[i] in saveobject){window[load[i]]=pad(window[load[i]],saveobject[load[i]])}
         }
         pause()
         updateTrulyAll()
@@ -714,6 +715,16 @@ function lorder(lt,gt){
     for(var i=0;i<lt.length;i++){
         if(lt[i]>gt[i]){return true}
         if(lt[i]<gt[i]){return false}
+    }
+}
+function pad(x,y){
+    switch(typeof y){
+        case "number":
+            return y!==undefined?y:x
+            break;
+        default:
+            return Object.assign(x,y)
+            break;
     }
 }
 function setOption(x){
