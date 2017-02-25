@@ -8,6 +8,6 @@ Credits:
 * me (CatsAreFluffy), programming
 * [Makeworld](https://scratch.mit.edu/users/MAKEWORLD/), art (pre 0.4.1, Thorium)
 * [Mr-Scratchman](https://scratch.mit.edu/users/Mr-Scratchman/), art (Depleted Thorium, post 0.4.1)
-* [Pianomiles](https://scratch.mit.edu/users/piano_miles/), art (Super Plating)
+* [Pianomiles](https://scratch.mit.edu/users/piano_miles/), art (Super Plating, explosion)
 
 Roadmaps moved to [wiki](https://github.com/CatsAreFluffy/reactorkk/wiki/Roadmap)
