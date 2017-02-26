@@ -41,8 +41,10 @@ Click to:
 
 <li>Potent Dolorium <span id="potent4v">0</span> <button id="potent4" onclick="buyPotent(4)">$64.8T</button> Increase the power output of Dolorium cells.</li>
 <li>Perpetual Dolorium <span id="perpetual4v">0</span> <button id="perpetual4" onclick="buyPerpetual(4)">$129.6T</button> Make Dolorium cells autoreplace.</li>
-<li>Potent Nefastium <span id="potent5v">0</span> <button id="potent5" disabled="true">$38.88Qa</button> Increase the power output of Nefastium cells. Coming soon!</li>
-<li>Perpetual Nefastium <span id="perpetual5v">0</span> <button id="perpetual5" disabled="true">$77.76Qa</button> Make Nefastium cells autoreplace. Coming soon!</li>
+
+<li>Potent Nefastium <span id="potent5v">0</span> <button id="potent5" onclick="buyPotent(5)">$38.88Qa</button> Increase the power output of Nefastium cells.</li>
+<li>Perpetual Nefastium <span id="perpetual5v">0</span> <button id="perpetual5" onclick="buyPerpetual(5)">$77.76Qa</button> Make Nefastium cells autoreplace.</li>
+
 
 <li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button> Autosell (level)/100 of your power capacity.</li>
 <li>Improved Wiring <span id="generic3v">0</span> <button id="generic3" onclick="buyGeneric(3)">$1000</button> Increase capacitor's capacity</li>
@@ -62,6 +64,7 @@ Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, th
 </ul>
 <button id="save" onclick="save()">Save</button><button id="load" onclick="load()">Load</button><br>
 <textarea id="savefile" style="width: 250; height: 100;">Paste your save code here</textarea><br>
+Reactor Knockoff Knockoff 0.5.1 beta 2
 Reactor Knockoff Knockoff 0.5.1 beta 1
 </span>
 <script>
@@ -85,9 +88,9 @@ function run(){
     window.run=true
     window.tick=setInterval(income,500)
     window.objective=0
-    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","Buy a Perpetual upgrade ($500)","Generate 200 power per tick ($1000)","Place a Plutonium cell ($2500)","All objectives completed! (for now...)"]
+    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","Buy a Perpetual upgrade ($500)","Generate 200 power per tick ($1000)","Place a Plutonium cell ($2500)","Generate 1000 power per tick ($10K)","All objectives completed! (for now...)"]
     window.tracker={boughtitem:0,soldpower:0,zeroheat:0,boughtvent:0,upgraded:0,perpetual:0,maxcelltier:0}
-    window.rewards=[10,10,10,50,100,250,500,1000,2500,1.79e308]
+    window.rewards=[10,10,10,50,100,250,500,1000,2500,10000,1.79e308]
     window.selector=[0,0,0,0,0,0]
     window.exactplz=false
     window.mode=buy
@@ -132,7 +135,11 @@ function resetValues(tier){
         {name:"dolorium1",gname:"Dolorium Cell ($1296B)",cost:1296000000000,default:{type:"cell",image:"dolorium1",income:506250000,heat:506250000,power:3840,capacity:0,pulses:1,pulse:0,sell:0,tier:5,id:16,name:"dolorium1",replacecost:1296000000000}},
         {name:"dolorium2",gname:"Dual Dolorium Cell ($3240B)",cost:3240000000000,default:{type:"cell",image:"dolorium2",income:2025000000,heat:4050000000,power:3840,capacity:0,pulses:2,pulse:0,sell:0,tier:5,id:17,name:"dolorium2",replacecost:3240000000000}},
         {name:"dolorium4",gname:"Quad Dolorium Cell ($7776B)",cost:7776000000000,default:{type:"cell",image:"dolorium4",income:6075000000,heat:18225000000,power:3840,capacity:0,pulses:4,pulse:0,sell:0,tier:5,id:18,name:"dolorium4",replacecost:7776000000000}},
-        {name:"dolorium8",gname:"Octo Dolorium Cell ($18.14T)",cost:18144000000000,default:{type:"cell",image:"dolorium8",income:16200000000,heat:64800000000,power:3840,capacity:0,pulses:4,pulse:0,sell:0,tier:5,id:18,name:"dolorium8",replacecost:18144000000000}}
+        {name:"dolorium8",gname:"Octo Dolorium Cell ($18.14T)",cost:18144000000000,default:{type:"cell",image:"dolorium8",income:16200000000,heat:64800000000,power:3840,capacity:0,pulses:8,pulse:0,sell:0,tier:5,id:19,name:"dolorium8",replacecost:18144000000000}},
+        {name:"nefastium1",gname:"Nefastium Cell ($777.6T)",cost:777600000000000,default:{type:"cell",image:"nefastium1",income:75937500000,heat:75937500000,power:15360,capacity:0,pulses:1,pulse:0,sell:0,tier:6,id:20,name:"nefastium1",replacecost:777600000000000}},
+        {name:"nefastium2",gname:"Dual Nefastium Cell ($1944T)",cost:1944000000000000,default:{type:"cell",image:"nefastium2",income:303750000000,heat:607500000000,power:15360,capacity:0,pulses:2,pulse:0,sell:0,tier:6,id:21,name:"nefastium2",replacecost:1944000000000000}},
+        {name:"nefastium4",gname:"Quad Nefastium Cell ($4666T)",cost:4665600000000000,default:{type:"cell",image:"nefastium4",income:911250000000,heat:2733750000000,power:15360,capacity:0,pulses:4,pulse:0,sell:0,tier:6,id:22,name:"nefastium4",replacecost:4665600000000000}},
+        {name:"nefastium8",gname:"Octo Nefastium Cell ($10.89Qa)",cost:10886400000000000,default:{type:"cell",image:"nefastium8",income:2430000000000,heat:9720000000000,power:15360,capacity:0,pulses:8,pulse:0,sell:0,tier:6,id:23,name:"nefastium8",replacecost:10886400000000000}}
         ],[
         {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50,tier:1}},
         {name:"vent2",gname:"Advanced Vent ($12.5K)",cost:12500,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:12500,tier:2}},
@@ -160,13 +167,14 @@ function resetValues(tier){
         {name:"plating1",gname:"Basic Plating ($1000)",cost:1000,default:{type:"plating",image:"plating1",heat:100,sell:1000,tier:1}},
         {name:"plating2",gname:"Advanced Plating ($160K)",cost:160000,default:{type:"plating",image:"plating2",heat:14000,sell:160000,tier:2}},
         {name:"plating3",gname:"Super Plating ($25.6M)",cost:25600000,default:{type:"plating",image:"plating3",heat:1960000,sell:160000,tier:3}},
-        {name:"plating4",gname:"Wondrous Plating ($4096M)",cost:4096000000,default:{type:"plating",image:"plating4",heat:2744000000,sell:4096000000,tier:4}}
-        //,{name:"cap5",gname:"Ultimate Plating ($655.4B)",cost:655360000000,default:{type:"plating",image:"plating5",heat:384160000000,sell:655360000000,tier:5}} //image not done
+        {name:"plating4",gname:"Wondrous Plating ($4096M)",cost:4096000000,default:{type:"plating",image:"plating4",heat:2744000000,sell:4096000000,tier:4}},
+        {name:"cap5",gname:"Ultimate Plating ($655.4B)",cost:655360000000,default:{type:"plating",image:"plating5",heat:384160000000,sell:655360000000,tier:5}}
         ],[
         {name:"cool1",gname:"Basic Coolant Cell ($500)",cost:5000,default:{type:"coolant",image:"cool1",capacity:2000,heat:0,sell:500,tier:1}},
         {name:"cool2",gname:"Advanced Coolant Cell ($100K)",cost:100000,default:{type:"coolant",image:"cool2",capacity:100000,heat:0,sell:100000,tier:2}},
         {name:"cool3",gname:"Super Coolant Cell ($20M)",cost:20000000,default:{type:"coolant",image:"cool3",capacity:5000000,heat:0,sell:20000000,tier:3}},
-        {name:"cool4",gname:"Wondrous Coolant Cell ($4000M)",cost:4000000000,default:{type:"coolant",image:"cool4",capacity:250000000,heat:0,sell:4000000000,tier:4}}
+        {name:"cool4",gname:"Wondrous Coolant Cell ($4000M)",cost:4000000000,default:{type:"coolant",image:"cool4",capacity:250000000,heat:0,sell:4000000000,tier:4}},
+        {name:"cool4",gname:"Ultimate Coolant Cell ($800B)",cost:800000000000,default:{type:"coolant",image:"cool4",capacity:12500000000,heat:0,sell:800000000000,tier:5}}
         ]]
         window.upgrades={potent:[0,0,0,0,0,0],perpetual:[0,0,0,0,0,0],generic:[0,0,0,0,0]}
     }
@@ -204,7 +212,7 @@ function drawGrid(){
     }
 }
 function loadImages(){
-    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","thorium1","thorium1d","thorium2","thorium2d","thorium4","thorium4d","thorium8","thorium8d","seaborgium1","seaborgium1d","seaborgium2","seaborgium2d","seaborgium4","seaborgium4d","seaborgium8","seaborgium8d","dolorium1","dolorium1d","dolorium2","dolorium2d","dolorium4","dolorium4d","dolorium8","dolorium8d","nefastium1","nefastium1d","nefastium2","nefastium2d","nefastium4","nefastium4d","nefastium8","nefastium8d","vent1","vent2","vent3","vent4","vent5","outlet1","outlet2","outlet3","outlet4","outlet5","inlet1","inlet2","inlet3","inlet4","inlet5","cap1","cap2","cap3","cap4","cap5","plating1","plating2","plating3","plating4","cool1","cool2","cool3","cool4","boom"]
+    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","thorium1","thorium1d","thorium2","thorium2d","thorium4","thorium4d","thorium8","thorium8d","seaborgium1","seaborgium1d","seaborgium2","seaborgium2d","seaborgium4","seaborgium4d","seaborgium8","seaborgium8d","dolorium1","dolorium1d","dolorium2","dolorium2d","dolorium4","dolorium4d","dolorium8","dolorium8d","nefastium1","nefastium1d","nefastium2","nefastium2d","nefastium4","nefastium4d","nefastium8","nefastium8d","vent1","vent2","vent3","vent4","vent5","outlet1","outlet2","outlet3","outlet4","outlet5","inlet1","inlet2","inlet3","inlet4","inlet5","cap1","cap2","cap3","cap4","cap5","plating1","plating2","plating3","plating4","plating5","cool1","cool2","cool3","cool4","cool5","boom"]
     for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
@@ -668,6 +676,9 @@ function checkObjectives(){
         case 8:
             complete=tracker.maxcelltier>1
             break;
+        case 9:
+            complete=buxpertick>1000
+            break;
         default:
             complete=false //maybe later :D
             break;
@@ -720,14 +731,14 @@ function setsavefile(x){
     document.getElementById("savefile").value=x
 }
 function save(){
-    var saveobject={version:[0,5,1,1],bux:bux,power:power,heat:heat,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
+    var saveobject={version:[0,5,1,2],bux:bux,power:power,heat:heat,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
     setsavefile(JSON.stringify(saveobject))
     return JSON.stringify(saveobject)
 }
 function load(){
     var saveobject=JSON.parse(savefile())
     var load=["bux","power","heat","maxpower","maxheat","objective","options","upgrades","tracker","reactor"]
-    if(lorder(saveobject.version,[0,5,1,1])){
+    if(lorder(saveobject.version,[0,5,1,2])){
         setsavefile("Future version detected. Please use latest version of game.")
     }else{
         resetValues(3)
