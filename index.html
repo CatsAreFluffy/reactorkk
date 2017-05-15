@@ -3,7 +3,8 @@
 <span id="bux">Money: $10</span>
 <span id="power">Power: 0/100</span>
 <button onclick="sellpower()">Sell!</button>
-<span id="heat">Heat: 0/1000</span> <button onclick="updateHeat(-1)">-1 Heat</button><br>
+<span id="heat">Heat: 0/1000</span> <button onclick="updateHeat(-1)">-1 Heat</button>
+<span id="ep">EP: 0/0/0</span><br>
 <button onclick="togglePause()" id="pause">Pause</button><button onclick="togglePerpetual()" id="perpetual">Disable perpetual cells</button><br>
 Objective: <span id="objective">Place a cell ($10)</span><br>
 <button onclick="prevType()">&lt;</button>
@@ -41,10 +42,8 @@ Click to:
 
 <li>Potent Dolorium <span id="potent4v">0</span> <button id="potent4" onclick="buyPotent(4)">$64.8T</button> Increase the power output of Dolorium cells.</li>
 <li>Perpetual Dolorium <span id="perpetual4v">0</span> <button id="perpetual4" onclick="buyPerpetual(4)">$129.6T</button> Make Dolorium cells autoreplace.</li>
-
 <li>Potent Nefastium <span id="potent5v">0</span> <button id="potent5" onclick="buyPotent(5)">$38.88Qa</button> Increase the power output of Nefastium cells.</li>
 <li>Perpetual Nefastium <span id="perpetual5v">0</span> <button id="perpetual5" onclick="buyPerpetual(5)">$77.76Qa</button> Make Nefastium cells autoreplace.</li>
-
 
 <li>Improved Powerlines <span id="generic0v">0</span> <button id="generic0" onclick="buyGeneric(0)">$100</button> Autosell (level)/100 of your power capacity.</li>
 <li>Improved Wiring <span id="generic3v">0</span> <button id="generic3" onclick="buyGeneric(3)">$1000</button> Increase capacitor's capacity</li>
@@ -64,7 +63,7 @@ Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, th
 </ul>
 <button id="save" onclick="save()">Save</button><button id="load" onclick="load()">Load</button><br>
 <textarea id="savefile" style="width: 250; height: 100;">Paste your save code here</textarea><br>
-Reactor Knockoff Knockoff 0.5.1 beta 3
+Reactor Knockoff Knockoff 0.6 alpha (no touchy)
 </span>
 <script>
 function run(){
@@ -76,21 +75,14 @@ function run(){
     window.item=0
     window.type=0
     window.autosell=0
-    window.reactor=[]
-    for(var i=0;i<=canvas.width/30;i++){
-        reactor.push([])
-        for(var j=0;j<=canvas.width/30;j++){
-            reactor[reactor.length-1].push({type:"empty",explosion:0})
-        }
-    }
     window.perpetual=true
     window.run=true
     window.tick=setInterval(income,500)
     window.objective=0
-    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","Buy a Perpetual upgrade ($500)","Generate 200 power per tick ($1000)","Place a Plutonium cell ($2500)","Generate 1000 power per tick ($10K)","All objectives completed! (for now...)"]
+    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","Buy a Perpetual upgrade ($500)","Generate 200 power per tick ($1000)","Place a Plutonium cell ($2500)","Generate 1000 power per tick ($10K)","Buy Improved Vents level 3 ($15K)","Autosell 1000 power per tick ($15K)","All objectives completed! (for now...)"]
     window.tracker={boughtitem:0,soldpower:0,zeroheat:0,boughtvent:0,upgraded:0,perpetual:0,maxcelltier:0}
-    window.rewards=[10,10,10,50,100,250,500,1000,2500,10000,1.79e308]
-    window.selector=[0,0,0,0,0,0]
+    window.rewards=[10,10,10,50,100,250,500,1000,2500,10000,15000,15000,1.79e308]
+    window.selector=[0,0,0,0,0,0,0]
     window.exactplz=false
     window.mode=buy
     window.options=[true,false] //replace cells with shiftclick, shiftclick between types
@@ -111,6 +103,7 @@ function resetValues(tier){
         window.bux=10
         window.power=0
         window.heat=0
+        window.ep=0
     }
     if(tier>1){ //reboot
         window.items=[
@@ -155,7 +148,7 @@ function resetValues(tier){
         {name:"inlet2",gname:"Advanced Inlet ($32K)",cost:32000,default:{type:"inlet",image:"inlet2",in:300,capacity:0,sell:32000,tier:2}},
         {name:"inlet3",gname:"Super Inlet ($6400K)",cost:6400000,default:{type:"inlet",image:"inlet3",in:22500,capacity:0,sell:6400000,tier:3}},
         {name:"inlet4",gname:"Wondrous Inlet ($1280M)",cost:1280000000,default:{type:"inlet",image:"inlet4",in:1687500,capacity:0,sell:1280000000,tier:4}},
-        {name:"inlet5",gname:"Ultimate Outlet ($256B)",cost:256000000000,default:{type:"inlet",image:"inlet5",in:126562500,capacity:0,sell:256000000000,tier:5}}
+        {name:"inlet5",gname:"Ultimate Inlet ($256B)",cost:256000000000,default:{type:"inlet",image:"inlet5",in:126562500,capacity:0,sell:256000000000,tier:5}}
         ],[
         {name:"cap1",gname:"Basic Capacitor ($1000)",cost:1000,default:{type:"capacitor",image:"cap1",power:100,capacity:10,heat:0,sell:1000,tier:1}},
         {name:"cap2",gname:"Advanced Capacitor ($160K)",cost:160000,default:{type:"capacitor",image:"cap2",power:14000,capacity:50,heat:0,sell:160000,tier:2}},
@@ -174,10 +167,22 @@ function resetValues(tier){
         {name:"cool3",gname:"Super Coolant Cell ($20M)",cost:20000000,default:{type:"coolant",image:"cool3",capacity:5000000,heat:0,sell:20000000,tier:3}},
         {name:"cool4",gname:"Wondrous Coolant Cell ($4000M)",cost:4000000000,default:{type:"coolant",image:"cool4",capacity:250000000,heat:0,sell:4000000000,tier:4}},
         {name:"cool4",gname:"Ultimate Coolant Cell ($800B)",cost:800000000000,default:{type:"coolant",image:"cool4",capacity:12500000000,heat:0,sell:800000000000,tier:5}}
+        ],[
+        {name:"accel1",gname:"Basic Particle Accelerator ($1000B)",cost:1000000000000,default:{type:"accelerator",image:"accel1",maxheat:500000000,maxep:0.02,capacity:100,heat:0,sell:1000000000000,tier:1}},
+        {name:"accel2",gname:"Advanced Particle Accelerator ($1000Qa)",cost:1000000000000000000,default:{type:"accelerator",image:"accel1",maxheat:500000000000000,maxep:2,capacity:100000000,heat:0,sell:1000000000000000000,tier:2}},
         ]]
         window.upgrades={potent:[0,0,0,0,0,0],perpetual:[0,0,0,0,0,0],generic:[0,0,0,0,0]}
+        window.reactor=[]
+        for(var i=0;i<=canvas.width/30;i++){
+            reactor.push([])
+            for(var j=0;j<=canvas.width/30;j++){
+                reactor[reactor.length-1].push({type:"empty",explosion:0})
+            }
+        }
     }
     if(tier>2){ //restart game
+        window.aep=0
+        window.sep=0
         window.tooltips={
         cell:function(cell){return "Generates "+format(cell.income*(upgrades.potent[cell.tier-1]+1))+" power and "+format(cell.heat)+" heat per tick for "+format(cell.power)+" ticks."},
         vent:function(vent){return "Vents "+format(vent.vent*(upgrades.generic[1]+1)*(1+capboost/100*upgrades.generic[4]))+" heat per tick. Holds "+format(vent.capacity)+" heat."},
@@ -185,9 +190,10 @@ function resetValues(tier){
         outlet:function(out){return "Adds "+format(out.out*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]))+" heat to adjacent components."},
         inlet:function(inlet){return "Removes "+format(inlet.in*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]))+" heat from adjacent components."},
         plating:function(plate){return "Adds "+format(plate.heat)+" heat capacity to your reactor."},
-        coolant:function(cool){return "Stores "+format(cool.capacity)+" heat."}
+        coolant:function(cool){return "Stores "+format(cool.capacity)+" heat."},
+        accelerator:function(accel){return "Generates Exotic Particles based on heat passing through it. Maximum "+format(accel.maxheat)+" heat for generation. Stores "+format(accel.capacity)+" heat."}
         }
-        window.types=["Cells","Vents","In/Outlets","Capacitors","Plating","Coolant Cells"]
+        window.types=["Cells","Vents","In/Outlets","Capacitors","Plating","Coolant Cells","Particle Accelerators"]
         window.itemstable={
         uranium1:0,uranium2:1,uranium4:2,uranium8:3,
         plutonium1:4,plutonium2:5,plutonium4:6,plutonium8:7,
@@ -211,7 +217,7 @@ function drawGrid(){
     }
 }
 function loadImages(){
-    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","thorium1","thorium1d","thorium2","thorium2d","thorium4","thorium4d","thorium8","thorium8d","seaborgium1","seaborgium1d","seaborgium2","seaborgium2d","seaborgium4","seaborgium4d","seaborgium8","seaborgium8d","dolorium1","dolorium1d","dolorium2","dolorium2d","dolorium4","dolorium4d","dolorium8","dolorium8d","nefastium1","nefastium1d","nefastium2","nefastium2d","nefastium4","nefastium4d","nefastium8","nefastium8d","vent1","vent2","vent3","vent4","vent5","outlet1","outlet2","outlet3","outlet4","outlet5","inlet1","inlet2","inlet3","inlet4","inlet5","cap1","cap2","cap3","cap4","cap5","plating1","plating2","plating3","plating4","plating5","cool1","cool2","cool3","cool4","cool5","boom"]
+    var images=["uranium1","uranium1d","uranium2","uranium2d","uranium4","uranium4d","uranium8","uranium8d","plutonium1","plutonium1d","plutonium2","plutonium2d","plutonium4","plutonium4d","plutonium8","plutonium8d","thorium1","thorium1d","thorium2","thorium2d","thorium4","thorium4d","thorium8","thorium8d","seaborgium1","seaborgium1d","seaborgium2","seaborgium2d","seaborgium4","seaborgium4d","seaborgium8","seaborgium8d","dolorium1","dolorium1d","dolorium2","dolorium2d","dolorium4","dolorium4d","dolorium8","dolorium8d","nefastium1","nefastium1d","nefastium2","nefastium2d","nefastium4","nefastium4d","nefastium8","nefastium8d","protium1","protium1d","protium2","protium2d","protium4","protium4d","protium8","protium8d","vent1","vent2","vent3","vent4","vent5","outlet1","outlet2","outlet3","outlet4","outlet5","inlet1","inlet2","inlet3","inlet4","inlet5","cap1","cap2","cap3","cap4","cap5","plating1","plating2","plating3","plating4","plating5","cool1","cool2","cool3","cool4","cool5","accel1","boom"]
     for(var i=0;i<images.length;i++){
         window[images[i]+"img"]=new Image()
         window[images[i]+"img"].src="./"+images[i]+".png"
@@ -411,26 +417,53 @@ function income(){
                 cell=reactor[i][j]
                 switch(cell.type){
                     case "cell":
+                        console.log(cell.heat)
                         addheat(i,j,cell.heat*Math.pow(cell.pulse+1,2),false)
                         break;
                     default:
                         break;
                 }
             }
+       }
+        for(var i=0;i<reactor.length;i++){ //accelerator tick
+            for(var j=0;j<reactor[i].length;j++){
+                cell=reactor[i][j]
+                switch(cell.type){
+                    case "accelerator":
+                        console.log(cell.heat)
+                        updateEP(cell.heat/cell.maxheat*cell.maxep)
+                        break;
+                    default:
+                        break;
+                }
+            }
         }
-        for(var i=0;i<reactor.length;i++){ //other heat tick
+        for(var i=0;i<reactor.length;i++){ //inlet tick
+            for(var j=0;j<reactor[i].length;j++){
+                cell=reactor[i][j]
+                switch(cell.type){
+                    case "inlet":
+                        heat+=removeheat(i,j,cell.in*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]),true)
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        for(var i=0;i<reactor.length;i++){ //outlet tick
             for(var j=0;j<reactor[i].length;j++){
                 cell=reactor[i][j]
                 switch(cell.type){
                     case "outlet":
                         addheat(i,j,Math.min(cell.out*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]),heat),true)
                         heat-=Math.min(cell.out*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]),heat)
+                        break;
                     default:
                         break;
                 }
             }
         }
-        for(var i=0;i<reactor.length;i++){ //heat minus tick
+        for(var i=0;i<reactor.length;i++){ //vent tick
             for(var j=0;j<reactor[i].length;j++){
                 cell=reactor[i][j]
                 switch(cell.type){
@@ -438,8 +471,6 @@ function income(){
                         cell.heat-=cell.vent*(upgrades.generic[1]+1)*(1+capboost/100*upgrades.generic[4])
                         if(cell.heat<0){cell.heat=0}
                         break;
-                    case "inlet":
-                        heat+=removeheat(i,j,cell.in*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]),true)
                     default:
                         break;
                 }
@@ -469,13 +500,14 @@ function income(){
                         if(cell.capacity&&cell.heat>cell.capacity){
                             reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
                         }
+                        break;
                 }
                 if(heat>maxheat*2&&cell.type!="empty"){reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
             }
         }
         updateBux(Math.min(autosell,power))
         updatePower(-Math.min(autosell,power))
-        updateHeat(Math.min((maxheat-heat)/50,-0.1))
+        updateHeat(Math.min((maxheat-heat)/50,maxheat*-0.0001))
     }
     maxpower=100
     maxheat=1000
@@ -519,6 +551,10 @@ function updateHeat(amount){
     if(heat<0.1&&tracker.soldpower){tracker.zeroheat++}
     update("heat","Heat: "+format(heat)+"/"+format(maxheat))
 }
+function updateEP(amount){
+    ep+=amount
+    update("ep","EP: "+format(aep)+"/"+format(sep+aep)+", "+format(ep))
+}
 function updateItem(item){
     update("item",currentItem().gname)
     update("tooltip",tooltips[currentItem().default.type].call(null,currentItem().default))
@@ -531,6 +567,7 @@ function updateAll(){
     updatePower(0)
     updateHeat(0)
     updateBux(0)
+    updateEP(0)
     updateItem(item)
     updateType(type)
 }
@@ -678,6 +715,12 @@ function checkObjectives(){
         case 9:
             complete=buxpertick>1000
             break;
+        case 10:
+            complete=upgrades.generic[1]>2
+            break;
+        case 11:
+            complete=Math.min(autosell,buxpertick)>1000
+            break;
         default:
             complete=false //maybe later :D
             break;
@@ -703,7 +746,7 @@ function format(n){
         if(norder){
             return (n/Math.pow(1000,norder)).toPrecision(4)+modifier(norder)
         }else{
-            return Math.round(n*1000000)/1000000
+            return Math.round(n*10000)/10000
         }
     }else{return n}
 }
@@ -730,14 +773,14 @@ function setsavefile(x){
     document.getElementById("savefile").value=x
 }
 function save(){
-    var saveobject={version:[0,5,1,2],bux:bux,power:power,heat:heat,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
+    var saveobject={version:[0,6,0,1],bux:bux,power:power,heat:heat,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
     setsavefile(JSON.stringify(saveobject))
     return JSON.stringify(saveobject)
 }
 function load(){
     var saveobject=JSON.parse(savefile())
     var load=["bux","power","heat","maxpower","maxheat","objective","options","upgrades","tracker","reactor"]
-    if(lorder(saveobject.version,[0,5,1,2])){
+    if(lorder(saveobject.version,[0,6,0,1])){
         setsavefile("Future version detected. Please use latest version of game.")
     }else{
         resetValues(3)
@@ -766,5 +809,10 @@ function pad(x,y){
 function setOption(x){
     options[x]=!options[x]
     update("options"+x,options[x]?"Yes":"No")
+}
+function reboot(){
+    aep+=ep
+    resetValues(2)
+    updateTrulyAll()
 }
 </script>
