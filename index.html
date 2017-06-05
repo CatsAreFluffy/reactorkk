@@ -56,6 +56,7 @@ Click to:
 <br>
 Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
 <button onclick="updateBux(1.79e308)">Cheat (Please be careful)</button><br><br>
+<button onclick="reboot()">Reboot</button><br><br>
 <h3>Options</h3>
 <ul>
 <li> Always replace depleted cells <button id="options0" onclick="setOption(0)">Yes</button></li>
@@ -160,7 +161,7 @@ function resetValues(tier){
         {name:"plating2",gname:"Advanced Plating ($160K)",cost:160000,default:{type:"plating",image:"plating2",heat:14000,sell:160000,tier:2}},
         {name:"plating3",gname:"Super Plating ($25.6M)",cost:25600000,default:{type:"plating",image:"plating3",heat:1960000,sell:160000,tier:3}},
         {name:"plating4",gname:"Wondrous Plating ($4096M)",cost:4096000000,default:{type:"plating",image:"plating4",heat:2744000000,sell:4096000000,tier:4}},
-        {name:"cap5",gname:"Ultimate Plating ($655.4B)",cost:655360000000,default:{type:"plating",image:"plating5",heat:384160000000,sell:655360000000,tier:5}}
+        {name:"plating5",gname:"Ultimate Plating ($655.4B)",cost:655360000000,default:{type:"plating",image:"plating5",heat:384160000000,sell:655360000000,tier:5}}
         ],[
         {name:"cool1",gname:"Basic Coolant Cell ($500)",cost:5000,default:{type:"coolant",image:"cool1",capacity:2000,heat:0,sell:500,tier:1}},
         {name:"cool2",gname:"Advanced Coolant Cell ($100K)",cost:100000,default:{type:"coolant",image:"cool2",capacity:100000,heat:0,sell:100000,tier:2}},
@@ -773,7 +774,7 @@ function setsavefile(x){
     document.getElementById("savefile").value=x
 }
 function save(){
-    var saveobject={version:[0,6,0,1],bux:bux,power:power,heat:heat,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
+    var saveobject={version:[0,6,0,1],bux:bux,power:power,heat:heat,ep:ep,aep:aep,sep:sep,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
     setsavefile(JSON.stringify(saveobject))
     return JSON.stringify(saveobject)
 }
