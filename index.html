@@ -51,11 +51,22 @@ Click to:
 <li>Improved Heat Transfer <span id="generic2v">0</span> <button id="generic2" onclick="buyGeneric(2)">$600</button> Increase the transfer rate of inlets and outlets.</li>
 <li>Active Venting <span id="generic4v">0</span> <button id="generic4" onclick="buyGeneric(4)">$1000</button> Capacitors boost the strength of vents, inlets, and outlets.</li>
 </ul>
+
+<h3>EP Upgrades</h3>
+<ul>
+<li>Unleashed Cells <span id="ep0v">0</span> <button id="ep0" onclick="buyEP(0)">100 EP</button> Double the power and heat of all cells.</li>
+<li>Infused Cells <span id="ep1v">0</span> <button id="ep1" onclick="buyEP(1)">50 EP</button> Increase the power of cells.</li>
+<li>Fluid Hyperdynamics <span id="ep2v">0</span> <button id="ep2" onclick="buyEP(2)">50 EP</button> Double the power and capacity of vents.</li>
+<li>Fractal Piping <span id="ep3v">0</span> <button id="ep3" onclick="buyEP(3)">50 EP</button> Double the power of in/outlets.</li>
+
+<li>Protium Cells <span id="unlock0v">0</span> <button id="unlock0" onclick="buyCellType(0)">50 EP</button> Unlock Protium cells which increase in power when they expire.</li>
+</ul>
+
 </span>
 <span id="options" style="float: left;">
 <br>
 Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, the <a href="http://www.kongregate.com/games/cael/reactor-incremental">double original</a>, the <a href="https://minecraft.curseforge.com/projects/industrial-craft/files">triple orignal</a>, or the <a href="http://www.kongregate.com/games/Baldurans/reactor-idle">alternate triple orginal</a>.
-<button onclick="updateBux(1.79e308)">Cheat (Please be careful)</button><br><br>
+<button onclick="updateBux(1.79e308)">Cheat (Please be careful)</button><button onclick="aep+=1.79e308;updateEP(0)">Hack (Please be carefuler)</button><br><br>
 <button onclick="reboot()">Reboot</button><br><br>
 <h3>Options</h3>
 <ul>
@@ -80,10 +91,10 @@ function run(){
     window.run=true
     window.tick=setInterval(income,500)
     window.objective=0
-    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","Buy a Perpetual upgrade ($500)","Generate 200 power per tick ($1000)","Place a Plutonium cell ($2500)","Generate 1000 power per tick ($10K)","Buy Improved Vents level 3 ($15K)","Autosell 1000 power per tick ($15K)","All objectives completed! (for now...)"]
+    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","Buy a Perpetual upgrade ($500)","Generate 200 power per tick ($1000)","Place a Plutonium cell ($2500)","Generate 1000 power per tick ($10K)","Buy Improved Vents level 3 ($15K)","Autosell 1000 power per tick ($20K)","Place a Thorium cell ($50K)","All objectives completed! (for now...)"]
     window.tracker={boughtitem:0,soldpower:0,zeroheat:0,boughtvent:0,upgraded:0,perpetual:0,maxcelltier:0}
-    window.rewards=[10,10,10,50,100,250,500,1000,2500,10000,15000,15000,1.79e308]
-    window.selector=[0,0,0,0,0,0,0]
+    window.rewards=[10,10,10,50,100,250,500,1000,2500,10000,15000,20000,50000,1.79e308]
+    window.selector=[0,0,0,0,0,0,0,0]
     window.exactplz=false
     window.mode=buy
     window.options=[true,false] //replace cells with shiftclick, shiftclick between types
@@ -134,6 +145,11 @@ function resetValues(tier){
         {name:"nefastium4",gname:"Quad Nefastium Cell ($4666T)",cost:4665600000000000,default:{type:"cell",image:"nefastium4",income:911250000000,heat:2733750000000,power:15360,capacity:0,pulses:4,pulse:0,sell:0,tier:6,id:22,name:"nefastium4",replacecost:4665600000000000}},
         {name:"nefastium8",gname:"Octo Nefastium Cell ($10.89Qa)",cost:10886400000000000,default:{type:"cell",image:"nefastium8",income:2430000000000,heat:9720000000000,power:15360,capacity:0,pulses:8,pulse:0,sell:0,tier:6,id:23,name:"nefastium8",replacecost:10886400000000000}}
         ],[
+        {name:"protium1",gname:"Protium Cell ($3840T)",cost:3840000000000000,unlock:0,default:{type:"cell",image:"protium1",income:4000000000000,heat:4000000000000,power:960,capacity:0,pulses:1,pulse:0,sell:0,tier:7,id:24,name:"protium1",replacecost:3840000000000000,unlock:0}},
+        {name:"protium2",gname:"Dual Protium Cell ($9600T)",cost:9600000000000000,unlock:0,default:{type:"cell",image:"protium2",income:8000000000000,heat:16000000000000,power:960,capacity:0,pulses:2,pulse:0,sell:0,tier:7,id:25,name:"protium2",replacecost:9600000000000000,unlock:0}},
+        {name:"protium4",gname:"Quad Protium Cell ($23.04Qa)",cost:23040000000000000,unlock:0,default:{type:"cell",image:"protium4",income:48000000000000,heat:144000000000000,power:960,capacity:0,pulses:4,pulse:0,sell:0,tier:7,id:26,name:"protium4",replacecost:23040000000000000,unlock:0}},
+        {name:"protium8",gname:"Octo Protium Cell ($53.76Qa)",cost:53760000000000000,unlock:0,default:{type:"cell",image:"protium8",income:128000000000000,heat:512000000000000,power:960,capacity:0,pulses:4,pulse:0,sell:0,tier:7,id:27,name:"protium8",replacecost:53760000000000000,unlock:0}}
+        ],[
         {name:"vent1",gname:"Basic Vent ($50)",cost:50,default:{type:"vent",image:"vent1",capacity:40,vent:4,heat:0,sell:50,tier:1}},
         {name:"vent2",gname:"Advanced Vent ($12.5K)",cost:12500,default:{type:"vent",image:"vent2",capacity:3000,vent:300,heat:0,sell:12500,tier:2}},
         {name:"vent3",gname:"Super Vent ($3125K)",cost:3125000,default:{type:"vent",image:"vent3",capacity:225000,vent:22500,heat:0,sell:3125000,tier:3}},
@@ -172,8 +188,9 @@ function resetValues(tier){
         {name:"accel1",gname:"Basic Particle Accelerator ($1000B)",cost:1000000000000,default:{type:"accelerator",image:"accel1",maxheat:500000000,maxep:0.02,capacity:100,heat:0,sell:1000000000000,tier:1}},
         {name:"accel2",gname:"Advanced Particle Accelerator ($1000Qa)",cost:1000000000000000000,default:{type:"accelerator",image:"accel1",maxheat:500000000000000,maxep:2,capacity:100000000,heat:0,sell:1000000000000000000,tier:2}},
         ]]
-        window.upgrades={potent:[0,0,0,0,0,0],perpetual:[0,0,0,0,0,0],generic:[0,0,0,0,0]}
+        window.upgrades={potent:[0,0,0,0,0,0],perpetual:[0,0,0,0,0,0],generic:[0,0,0,0,0],ep:[0,0,0,0],unlock:[0]}
         window.reactor=[]
+        window.cellmetas=[1] //protium bonus
         for(var i=0;i<=canvas.width/30;i++){
             reactor.push([])
             for(var j=0;j<=canvas.width/30;j++){
@@ -185,25 +202,28 @@ function resetValues(tier){
         window.aep=0
         window.sep=0
         window.tooltips={
-        cell:function(cell){return "Generates "+format(cell.income*(upgrades.potent[cell.tier-1]+1))+" power and "+format(cell.heat)+" heat per tick for "+format(cell.power)+" ticks."},
-        vent:function(vent){return "Vents "+format(vent.vent*(upgrades.generic[1]+1)*(1+capboost/100*upgrades.generic[4]))+" heat per tick. Holds "+format(vent.capacity)+" heat."},
+        cell:cellTooltip,
+        vent:function(vent){return "Vents "+format(ventHeat(vent))+" heat per tick. Holds "+format(heatCap(vent))+" heat."},
         capacitor:function(cap){return "Holds "+format(cap.power*(upgrades.generic[3]+1))+" power and "+format(cap.capacity)+" heat."},
-        outlet:function(out){return "Adds "+format(out.out*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]))+" heat to adjacent components."},
-        inlet:function(inlet){return "Removes "+format(inlet.in*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]))+" heat from adjacent components."},
+        outlet:function(out){return "Adds "+format(IOletHeat(out.out))+" heat to adjacent components."},
+        inlet:function(inlet){return "Removes "+format(IOletHeat(inlet.in))+" heat from adjacent components."},
         plating:function(plate){return "Adds "+format(plate.heat)+" heat capacity to your reactor."},
         coolant:function(cool){return "Stores "+format(cool.capacity)+" heat."},
         accelerator:function(accel){return "Generates Exotic Particles based on heat passing through it. Maximum "+format(accel.maxheat)+" heat for generation. Stores "+format(accel.capacity)+" heat."}
         }
-        window.types=["Cells","Vents","In/Outlets","Capacitors","Plating","Coolant Cells","Particle Accelerators"]
+        window.types=["Cells","Exotic Cells","Vents","In/Outlets","Capacitors","Plating","Coolant Cells","Particle Accelerators"]
         window.itemstable={
         uranium1:0,uranium2:1,uranium4:2,uranium8:3,
         plutonium1:4,plutonium2:5,plutonium4:6,plutonium8:7,
         thorium1:8,thorium2:9,thorium4:10,thorium8:11,
         seaborgium1:12,seaborgium2:13,seaborgium4:14,seaborgium8:15,
         dolorium1:16,dolorium2:17,dolorium4:18,dolorium8:19,
-        nefastium1:20,nefastium2:21,nefastium4:22,nefastium8:23} //oh yeah that
+        nefastium1:20,nefastium2:21,nefastium4:22,nefastium8:23,
+        protium1:24,protium2:25,protium4:26,protium8:27} //oh yeah that
         window.cellcosts=[10,6000,3600000,2160000000,1296000000000,777600000000000]
         window.genericcosts=[100,250,600,1000,1000] //powerlines,vents,ioutlets,wiring,active
+        window.epcosts=[100,50,50,50] //unleashed,infused,hyperdynamics,piping
+        window.unlockcosts=[50]
     }
 }
 function drawGrid(){
@@ -224,8 +244,47 @@ function loadImages(){
         window[images[i]+"img"].src="./"+images[i]+".png"
     }
 }
+function cellPower(cell){
+    if(cell.tier<7){
+        return cell.income*(upgrades.potent[cell.tier-1]+1)*(upgrades.ep[1]+1)*Math.pow(2,upgrades.ep[0])
+    }else{
+        var base=cell.income*(upgrades.ep[1]+1)*Math.pow(2,upgrades.ep[0])
+        if(cell.tier==7){
+            base*=cellmetas[0]
+        }
+        return base
+    }
+}
+function cellHeat(cell){
+    return cell.heat*Math.pow(2,upgrades.ep[0])
+}
+function ventHeat(vent){
+    return vent.vent*(upgrades.generic[1]+1)*(1+capboost/100*upgrades.generic[4])*Math.pow(2,upgrades.ep[2])
+}
+function heatCap(cell){
+    if(cell.type=="vent"){
+        return cell.capacity*Math.pow(2,upgrades.ep[2])
+    }else{
+        return cell.capacity
+    }
+}
+function IOletHeat(strength){
+    return strength*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4])*Math.pow(2,upgrades.ep[3])
+}
+function cellTooltip(cell){
+    if(cell.tier<7||upgrades.unlock[cell.unlock]){
+        str="Generates "+format(cellPower(cell))+" power and "+format(cellHeat(cell))+" heat per tick for "+format(cell.power)+" ticks."
+        if(cell.tier>=7){
+            str+=" "
+            str+=["Power output increases every time a Protium cell expries."][cell.tier-7]
+        }
+        return str
+    }else{
+        return "Locked"
+    }
+}
 function buyitem(object,x,y,gridx,gridy){
-    if(bux>=object.cost){
+    if(bux>=object.cost&&unlocked(object)){
         sellitem(gridx,gridy)
         reactor[gridx][gridy]=Object.assign({drawx:x,drawy:y},object.default)
         tracker.boughtitem++
@@ -234,6 +293,9 @@ function buyitem(object,x,y,gridx,gridy){
         updateBux(-object.cost)
         updateAll()
     }
+}
+function unlocked(object){
+    return typeof object.unlock=="undefined"||upgrades.unlock[object.unlock]
 }
 function sellitem(x,y){
     if(reactor[x][y].type!="empty"){
@@ -419,7 +481,7 @@ function income(){
                 switch(cell.type){
                     case "cell":
                         console.log(cell.heat)
-                        addheat(i,j,cell.heat*Math.pow(cell.pulse+1,2),false)
+                        addheat(i,j,cellHeat(cell)*Math.pow(cell.pulse+1,2),false)
                         break;
                     default:
                         break;
@@ -444,7 +506,7 @@ function income(){
                 cell=reactor[i][j]
                 switch(cell.type){
                     case "inlet":
-                        heat+=removeheat(i,j,cell.in*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]),true)
+                        heat+=removeheat(i,j,IOletHeat(cell.in),true)
                         break;
                     default:
                         break;
@@ -456,8 +518,8 @@ function income(){
                 cell=reactor[i][j]
                 switch(cell.type){
                     case "outlet":
-                        addheat(i,j,Math.min(cell.out*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]),heat),true)
-                        heat-=Math.min(cell.out*(upgrades.generic[2]+1)*(1+capboost/100*upgrades.generic[4]),heat)
+                        addheat(i,j,Math.min(IOletHeat(cell.out),heat),true)
+                        heat-=Math.min(IOletHeat(cell.out),heat)
                         break;
                     default:
                         break;
@@ -469,7 +531,7 @@ function income(){
                 cell=reactor[i][j]
                 switch(cell.type){
                     case "vent":
-                        cell.heat-=cell.vent*(upgrades.generic[1]+1)*(1+capboost/100*upgrades.generic[4])
+                        cell.heat-=ventHeat(cell)
                         if(cell.heat<0){cell.heat=0}
                         break;
                     default:
@@ -486,24 +548,29 @@ function income(){
                     break;
                     case "cell":
                         context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
-                        buxpertick+=cell.income*(upgrades.potent[cell.tier-1]+1)*(cell.pulse+1)
+                        buxpertick+=cellPower(cell)*(cell.pulse+1)
                         cell.pulse=0
                         cell.power--
                         if(!cell.power){
                             cell.type="dcell";cell.image+="d"
-                            if(upgrades.perpetual[cell.tier-1]&&perpetual){
-                                buyitem(items[0][itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
+                            if(cell.tier<upgrades.perpetual.length&&upgrades.perpetual[cell.tier-1]&&perpetual){
+                                var subtables=[-1,0,0,0,0,0,0,1,1,1,1,1,1] //if i ever add perpetual ep cells
+                                buyitem(items[subtables[cell.tier]][itemstable[cell.name]],cell.drawx,cell.drawy,i,j)
+                            }
+                            if(cell.tier==7){
+                                cellmetas[0]+=0.05*cell.pulses
                             }
                         }
                         break;
                     default:
                         context.drawImage(window[cell.image+"img"],cell.drawx,cell.drawy)
-                        if(cell.capacity&&cell.heat>cell.capacity){
+                        if(cell.capacity&&cell.heat>heatCap(cell)){
                             reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}
                         }
                         break;
                 }
-                if(heat>maxheat*2&&cell.type!="empty"){reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
+                if(heat>maxheat*2&&cell.type!="empty"||!unlocked(cell)){
+                    reactor[i][j]={type:"empty",explosion:4,drawx:cell.drawx,drawy:cell.drawy}}
             }
         }
         updateBux(Math.min(autosell,power))
@@ -554,7 +621,11 @@ function updateHeat(amount){
 }
 function updateEP(amount){
     ep+=amount
-    update("ep","EP: "+format(aep)+"/"+format(sep+aep)+", "+format(ep))
+    update("ep","EP: "+format(aep-sep)+"/"+format(aep)+", "+format(ep))
+}
+function spendEP(amount){
+    sep-=amount
+    update("ep","EP: "+format(aep-sep)+"/"+format(aep)+", "+format(ep))
 }
 function updateItem(item){
     update("item",currentItem().gname)
@@ -683,10 +754,28 @@ function buyGeneric(upgrade){
         update("generic"+upgrade+"v",upgrades.generic[upgrade])
     }
 }
+function buyEP(upgrade){
+    if(aep-sep>=epcosts[upgrade]*Math.pow(2,upgrades.ep[upgrade])){
+        tracker.upgraded++
+        spendEP(-epcosts[upgrade]*Math.pow(10,upgrades.ep[upgrade]))
+        upgrades.ep[upgrade]++
+        update("ep"+upgrade,format(epcosts[upgrade]*Math.pow(2,upgrades.ep[upgrade]))+" EP")
+        update("ep"+upgrade+"v",upgrades.ep[upgrade])
+    }
+}
+function buyCellType(tier){
+    if(aep-sep>=unlockcosts[tier]&&!upgrades.unlock[tier]){
+        tracker.upgraded++
+        spendEP(-unlockcosts[tier])
+        upgrades.unlock[tier]++
+        update("unlock"+tier,"Purchased")
+        update("unlock"+tier+"v",upgrades.unlock[tier])
+    }
+}
 function checkObjectives(){
     var complete=false
     switch(objective){
-        case 0:
+        case 0: //case statements suck, they should be replaced >:(
             complete=tracker.maxcelltier
             break;
         case 1:
@@ -721,6 +810,9 @@ function checkObjectives(){
             break;
         case 11:
             complete=Math.min(autosell,buxpertick)>1000
+            break;
+        case 12:
+            complete=tracker.maxcelltier>2
             break;
         default:
             complete=false //maybe later :D
@@ -817,3 +909,4 @@ function reboot(){
     updateTrulyAll()
 }
 </script>
+</body></html>
