@@ -75,7 +75,7 @@ Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, th
 </ul>
 <button id="save" onclick="save()">Save</button><button id="load" onclick="load()">Load</button><br>
 <textarea id="savefile" style="width: 250; height: 100;">Paste your save code here</textarea><br>
-Reactor Knockoff Knockoff 0.6 alpha (no touchy)
+Reactor Knockoff Knockoff 0.6 beta 1
 </span>
 <script>
 function run(){
@@ -866,14 +866,14 @@ function setsavefile(x){
     document.getElementById("savefile").value=x
 }
 function save(){
-    var saveobject={version:[0,6,0,1],bux:bux,power:power,heat:heat,ep:ep,aep:aep,sep:sep,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
+    var saveobject={version:[0,6,0,2],bux:bux,power:power,heat:heat,ep:ep,aep:aep,sep:sep,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
     setsavefile(JSON.stringify(saveobject))
     return JSON.stringify(saveobject)
 }
 function load(){
     var saveobject=JSON.parse(savefile())
-    var load=["bux","power","heat","maxpower","maxheat","objective","options","upgrades","tracker","reactor"]
-    if(lorder(saveobject.version,[0,6,0,1])){
+    var load=["bux","power","heat","maxpower","maxheat","objective","options","upgrades","tracker","reactor","ep","aep","sep"]
+    if(lorder(saveobject.version,[0,6,0,2])){
         setsavefile("Future version detected. Please use latest version of game.")
     }else{
         resetValues(3)
