@@ -4,7 +4,7 @@
 <span id="power">Power: 0/100</span>
 <button onclick="sellpower()">Sell!</button>
 <span id="heat">Heat: 0/1000</span> <button onclick="updateHeat(-1)">-1 Heat</button>
-<span id="ep">EP: 0/0/0</span><br>
+<span id="ep">EP: 0/0, 0</span><br>
 <button onclick="togglePause()" id="pause">Pause</button><button onclick="togglePerpetual()" id="perpetual">Disable perpetual cells</button><br>
 Objective: <span id="objective">Place a cell ($10)</span><br>
 <button onclick="prevType()">&lt;</button>
@@ -75,7 +75,7 @@ Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, th
 </ul>
 <button id="save" onclick="save()">Save</button><button id="load" onclick="load()">Load</button><br>
 <textarea id="savefile" style="width: 250; height: 100;">Paste your save code here</textarea><br>
-Reactor Knockoff Knockoff 0.6 beta 1
+Reactor Knockoff Knockoff 0.6 emergency bugfix version
 </span>
 <script>
 function run(){
@@ -90,10 +90,6 @@ function run(){
     window.perpetual=true
     window.run=true
     window.tick=setInterval(income,500)
-    window.objective=0
-    window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","Buy a Perpetual upgrade ($500)","Generate 200 power per tick ($1000)","Place a Plutonium cell ($2500)","Generate 1000 power per tick ($10K)","Buy Improved Vents level 3 ($15K)","Autosell 1000 power per tick ($20K)","Place a Thorium cell ($50K)","All objectives completed! (for now...)"]
-    window.tracker={boughtitem:0,soldpower:0,zeroheat:0,boughtvent:0,upgraded:0,perpetual:0,maxcelltier:0}
-    window.rewards=[10,10,10,50,100,250,500,1000,2500,10000,15000,20000,50000,1.79e308]
     window.selector=[0,0,0,0,0,0,0,0]
     window.exactplz=false
     window.mode=buy
@@ -103,6 +99,8 @@ function run(){
     drawGrid()
     context.stroke()
     loadImages()
+    autoload()
+    window.saver=setInterval(300000,autosave())
     unpause()
 }
 function resetValues(tier){
@@ -224,6 +222,10 @@ function resetValues(tier){
         window.genericcosts=[100,250,600,1000,1000] //powerlines,vents,ioutlets,wiring,active
         window.epcosts=[100,50,50,50] //unleashed,infused,hyperdynamics,piping
         window.unlockcosts=[50]
+        window.objective=0
+        window.objectives=["Place a cell ($10)","Sell your power ($10)","Reduce your heat to 0 ($10)","Place a vent next to a cell ($50)","Buy an upgrade ($100)","Generate 50 power per tick ($250)","Buy a Perpetual upgrade ($500)","Generate 200 power per tick ($1000)","Place a Plutonium cell ($2500)","Generate 1000 power per tick ($10K)","Buy Improved Vents level 3 ($15K)","Autosell 1000 power per tick ($20K)","Place a Thorium cell ($50K)","All objectives completed! (for now...)"]
+        window.tracker={boughtitem:0,soldpower:0,zeroheat:0,boughtvent:0,upgraded:0,perpetual:0,maxcelltier:0}
+        window.rewards=[10,10,10,50,100,250,500,1000,2500,10000,15000,20000,50000,1.79e308]
     }
 }
 function drawGrid(){
@@ -640,6 +642,7 @@ function updateAll(){
     updateHeat(0)
     updateBux(0)
     updateEP(0)
+    spendEP(0)
     updateItem(item)
     updateType(type)
 }
@@ -656,6 +659,14 @@ function updateTrulyAll(){
     for(var i=0;i<upgrades.generic.length;i++){
         update("generic"+i,"$"+format(genericcosts[i]*Math.pow(10,upgrades.generic[i])))
         update("generic"+i+"v",upgrades.generic[i])
+    }
+    for(var i=0;i<upgrades.ep.length;i++){
+        update("ep"+i,format(epcosts[i]*Math.pow(2,upgrades.ep[i]))+" EP")
+        update("ep"+i+"v",upgrades.ep[i])
+    }
+    for(var i=0;i<upgrades.unlock.length;i++){
+        update("unlock"+i,upgrades.perpetual[i]?"Purchased":format(unlockcosts[i]*100)+" EP")
+        update("unlock"+i+"v",upgrades.unlock[i])
     }
     for(var i=0;i<options.length;i++){
         update("options"+i,options[i]?"Yes":"No")
@@ -727,11 +738,12 @@ function clampheat(){
     heat=Math.round(heat*10)/10
 }
 function buyPotent(tier){
-    if(bux>=cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])){
+    var cost=cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])
+    if(bux>=cost){
         tracker.upgraded++
-        updateBux(-(cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])))
+        updateBux(-cost)
         upgrades.potent[tier]++
-        update("potent"+tier,"$"+format(cellcosts[tier]*50*Math.pow(10,upgrades.potent[tier])))
+        update("potent"+tier,"$"+format(cost))
         update("potent"+tier+"v",upgrades.potent[tier])
     }
 }
@@ -746,21 +758,24 @@ function buyPerpetual(tier){
     }
 }
 function buyGeneric(upgrade){
-    if(bux>=genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade])){
+    var cost=genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade])
+    if(bux>=cost){
         tracker.upgraded++
-        updateBux(-genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade]))
+        updateBux(-cost)
         upgrades.generic[upgrade]++
-        update("generic"+upgrade,"$"+format(genericcosts[upgrade]*Math.pow(10,upgrades.generic[upgrade])))
+        update("generic"+upgrade,"$"+format(cost))
         update("generic"+upgrade+"v",upgrades.generic[upgrade])
     }
 }
 function buyEP(upgrade){
-    if(aep-sep>=epcosts[upgrade]*Math.pow(2,upgrades.ep[upgrade])){
+    //made by Yamajama with style modifications by me
+    let epCost=epcosts[upgrade]*Math.pow(2,upgrades.ep[upgrade]);
+    if(aep-sep>=epCost){
         tracker.upgraded++
-        spendEP(-epcosts[upgrade]*Math.pow(10,upgrades.ep[upgrade]))
+        spendEP(-epCost)
         upgrades.ep[upgrade]++
-        update("ep"+upgrade,format(epcosts[upgrade]*Math.pow(2,upgrades.ep[upgrade]))+" EP")
-        update("ep"+upgrade+"v",upgrades.ep[upgrade])
+        update("ep"+upgrade, format(epCost)+" EP")
+        update("ep"+upgrade+"v", upgrades.ep[upgrade])
     }
 }
 function buyCellType(tier){
@@ -776,25 +791,25 @@ function checkObjectives(){
     var complete=false
     switch(objective){
         case 0: //case statements suck, they should be replaced >:(
-            complete=tracker.maxcelltier
+            complete=tracker.maxcelltier>0
             break;
         case 1:
-            complete=tracker.soldpower
+            complete=tracker.soldpower>0
             break;
         case 2:
-            complete=tracker.zeroheat
+            complete=tracker.zeroheat>0
             break;
         case 3:
-            complete=tracker.boughtvent
+            complete=tracker.boughtvent>0
             break;
         case 4:
-            complete=tracker.upgraded
+            complete=tracker.upgraded>0
             break;
         case 5:
             complete=buxpertick>50
             break;
         case 6:
-            complete=tracker.perpetual
+            complete=tracker.perpetual>0
             break;
         case 7:
             complete=buxpertick>200
@@ -865,15 +880,24 @@ function savefile(){
 function setsavefile(x){
     document.getElementById("savefile").value=x
 }
+const version=[0,6,0,2]
+const versionstr=version.join("")
 function save(){
-    var saveobject={version:[0,6,0,2],bux:bux,power:power,heat:heat,ep:ep,aep:aep,sep:sep,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
-    setsavefile(JSON.stringify(saveobject))
+    var savetext=savebase()
+    setsavefile(savetext)
+    return savetext
+}
+function savebase(){
+    var saveobject={version:version,bux:bux,power:power,heat:heat,ep:ep,aep:aep,sep:sep,maxpower:maxpower,maxheat:maxheat,objective:objective,options:options,tracker:tracker,upgrades:upgrades,reactor:reactor}
     return JSON.stringify(saveobject)
 }
 function load(){
-    var saveobject=JSON.parse(savefile())
+    loadbase(savefile())
+}
+function loadbase(savetext){
+    var saveobject=JSON.parse(savetext)
     var load=["bux","power","heat","maxpower","maxheat","objective","options","upgrades","tracker","reactor","ep","aep","sep"]
-    if(lorder(saveobject.version,[0,6,0,2])){
+    if(lorder(saveobject.version,version)){
         setsavefile("Future version detected. Please use latest version of game.")
     }else{
         resetValues(3)
@@ -882,6 +906,39 @@ function load(){
         }
         pause()
         updateTrulyAll()
+    }
+}
+function autosave(){
+    localStorage.setItem("rkk"+versionstr,savebase())
+    var verlist=JSON.parse(localStorage.getItem("rkkl"))
+    if(verlist&&verlist.every(a=>a!=version)){
+        verlist.push(version)
+        localStorage.setItem("rkkl",JSON.stringify(verlist))
+    }
+}
+function autoload(){
+    var temp=localStorage.getItem("rkk"+versionstr)
+    if(temp){
+        loadbase(temp)
+    }else{
+        var verliststr=localStorage.getItem("rkkl")
+        if(!verliststr){
+            localStorage.setItem("rkkl","[]")
+        }else{
+            var verlist=JSON.parse(verliststr)
+            console.log(verlist)
+            var bestversion=[-1,-1,-1,-1]
+            for(var i=0;i<verlist.length;i++){
+                console.log(version,verlist[i],bestversion)
+                if(lorder(version,verlist[i])&&lorder(verlist[i],bestversion)){
+                    bestversion=verlist[i]
+                }
+            }
+            var temp2=localStorage.getItem("rkk"+bestversion.join(""))
+            if(temp2){
+                loadbase(temp2)
+            }
+        }
     }
 }
 function lorder(lt,gt){
