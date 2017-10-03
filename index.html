@@ -75,7 +75,7 @@ Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, th
 </ul>
 <button id="save" onclick="save()">Save</button><button id="load" onclick="load()">Load</button><br>
 <textarea id="savefile" style="width: 250; height: 100;">Paste your save code here</textarea><br>
-Reactor Knockoff Knockoff 0.6 emergency bugfix version
+Reactor Knockoff Knockoff 0.6 bugfix 2
 </span>
 <script>
 function run(){
@@ -880,7 +880,7 @@ function savefile(){
 function setsavefile(x){
     document.getElementById("savefile").value=x
 }
-const version=[0,6,0,2]
+const version=[0,6,0,3]
 const versionstr=version.join("")
 function save(){
     var savetext=savebase()
