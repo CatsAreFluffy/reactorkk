@@ -743,7 +743,7 @@ function buyPotent(tier){
         tracker.upgraded++
         updateBux(-cost)
         upgrades.potent[tier]++
-        update("potent"+tier,"$"+format(cost))
+        update("potent"+tier,"$"+format(cost*10))
         update("potent"+tier+"v",upgrades.potent[tier])
     }
 }
@@ -763,7 +763,7 @@ function buyGeneric(upgrade){
         tracker.upgraded++
         updateBux(-cost)
         upgrades.generic[upgrade]++
-        update("generic"+upgrade,"$"+format(cost))
+        update("generic"+upgrade,"$"+format(cost*10))
         update("generic"+upgrade+"v",upgrades.generic[upgrade])
     }
 }
@@ -774,7 +774,7 @@ function buyEP(upgrade){
         tracker.upgraded++
         spendEP(-epCost)
         upgrades.ep[upgrade]++
-        update("ep"+upgrade, format(epCost)+" EP")
+        update("ep"+upgrade, format(epCost*2)+" EP")
         update("ep"+upgrade+"v", upgrades.ep[upgrade])
     }
 }
