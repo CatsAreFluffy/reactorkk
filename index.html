@@ -75,7 +75,7 @@ Play the <a href="https://cwmonkey.github.io/reactor-knockoff/">original</a>, th
 </ul>
 <button id="save" onclick="save()">Save</button><button id="load" onclick="load()">Load</button><br>
 <textarea id="savefile" style="width: 250; height: 100;">Paste your save code here</textarea><br>
-Reactor Knockoff Knockoff 0.6 bugfix 2
+Reactor Knockoff Knockoff 0.6 bugfix 3
 </span>
 <script>
 function run(){
@@ -520,8 +520,7 @@ function income(){
                 cell=reactor[i][j]
                 switch(cell.type){
                     case "outlet":
-                        addheat(i,j,Math.min(IOletHeat(cell.out),heat),true)
-                        heat-=Math.min(IOletHeat(cell.out),heat)
+                        heat-=addheat(i,j,Math.min(IOletHeat(cell.out),heat),true)
                         break;
                     default:
                         break;
@@ -693,6 +692,7 @@ function addheat(x,y,heat,peritem){
     }else{
         updateHeat(heat)
     }
+    return heat*(heatcells.length?heatcells.length:1)
 }
 function addpulse(x,y,heat){
     var cells=[]
@@ -880,7 +880,7 @@ function savefile(){
 function setsavefile(x){
     document.getElementById("savefile").value=x
 }
-const version=[0,6,0,3]
+const version=[0,6,0,4]
 const versionstr=version.join("")
 function save(){
     var savetext=savebase()
