@@ -186,8 +186,9 @@ function resetValues(tier){
         {name:"accel1",gname:"Basic Particle Accelerator ($1000B)",cost:1000000000000,default:{type:"accelerator",image:"accel1",maxheat:500000000,maxep:0.02,capacity:100,heat:0,sell:1000000000000,tier:1}},
         {name:"accel2",gname:"Advanced Particle Accelerator ($1000Qa)",cost:1000000000000000000,default:{type:"accelerator",image:"accel1",maxheat:500000000000000,maxep:2,capacity:100000000,heat:0,sell:1000000000000000000,tier:2}},
         ]]
-        window.upgrades={potent:[0,0,0,0,0,0],perpetual:[0,0,0,0,0,0],generic:[0,0,0,0,0],ep:[0,0,0,0],unlock:[0]}
         window.reactor=[]
+        window.upgrades.potent=[0,0,0,0,0,0]
+        window.upgrades.perpetual=Object.assign(upgrades,{potent:[0,0,0,0,0,0],perpetual:[0,0,0,0,0,0],generic:[0,0,0,0,0]})
         window.cellmetas=[1] //protium bonus
         for(var i=0;i<=canvas.width/30;i++){
             reactor.push([])
@@ -199,6 +200,7 @@ function resetValues(tier){
     if(tier>2){ //restart game
         window.aep=0
         window.sep=0
+        window.upgrades={potent:[0,0,0,0,0,0],perpetual:[0,0,0,0,0,0],generic:[0,0,0,0,0],ep:[0,0,0,0],unlock:[0]}
         window.tooltips={
         cell:cellTooltip,
         vent:function(vent){return "Vents "+format(ventHeat(vent))+" heat per tick. Holds "+format(heatCap(vent))+" heat."},
